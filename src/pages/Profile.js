@@ -1,26 +1,35 @@
-import React, { useState } from "react";
-import { Form, Input, Select, Button, Row, Col } from "antd";
+import React, { useState ,useEffect} from "react";
+import { Form, Input, Select, Button, Row, Col ,Image} from "antd";
+import axios from "axios";
 
 function Profile() {
   const OnButtonClick = (e) => {
     console.log("Button clicked");
   };
-
+  const [editingProfile, setEditingProfile] = useState(null);
+  const [dataSource, setDataSource] = useState({});
+  function getManageReq(){
+    axios.get('/users/userprofile')
+    .then(response=>{
+      console.log(response)
+      setDataSource(response.data);
+    })
+  }
+  useEffect(() => {
+    getManageReq();
+   }, []); 
   const [user, setUser] = useState({});
   const Logout = () => {
     localStorage.removeItem("userData");
     document.location.reload(true);
   };
 
-
-  const [componentSize, setComponentSize] = useState("default");
-
-  const onFormLayoutChange = ({ size }) => {
-    setComponentSize(size);
-  };
-
   return (
     <div className="Profile">
+    <div className="User-list">
+    <div className="Profilehead">
+        <h1>Profile</h1>
+        </div>
       <Row justify="center">
         <Col span={12}>
           <Form
@@ -31,26 +40,32 @@ function Profile() {
               span: 20,
             }}
             layout="horizontal"
-            initialValues={{
-              size: componentSize,
-            }}
-            onValuesChange={onFormLayoutChange}
-            size={componentSize}
           >
+          <div className="imgprofile">
+             <Image className="imgprofilebor"
+            preview={false} 
+            width={150}
+  height={150}
+ src={dataSource.image?.url}/></div>
             <Form.Item label="Username">
-              <Input placeholder="Username" />
+            <Input placeholder="Username"  value={dataSource?.username}
+              onChange={(e) => {
+                setEditingProfile((pre) => {
+                  return { ...pre, username: e.target.value };
+                });
+              }} />
             </Form.Item>
             <Form.Item label="Name">
-              <Input placeholder="Name" />
+            <Input placeholder="Name" value={dataSource?.firstname} />
             </Form.Item>
             <Form.Item label="Lastname">
-              <Input placeholder="Lastname" />
+            <Input placeholder="Name" value={dataSource?.lastname} />
             </Form.Item>
             <Form.Item label="E-mail">
-              <Input placeholder="E-mail" />
+            <Input placeholder="Name" value={dataSource?.email} />
             </Form.Item>
             <Form.Item label="Password">
-              <Input.Password placeholder="Password" />
+            <Input.Password placeholder="Password"  value={dataSource?.password} />
             </Form.Item>
             <Form.Item label="Status">
               <Select placeholder="Select a Status">
@@ -80,6 +95,7 @@ function Profile() {
           </Button>
         </Col>
       </Row>
+      </div>
     </div>
   );
 }
