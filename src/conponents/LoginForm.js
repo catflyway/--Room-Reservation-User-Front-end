@@ -3,6 +3,7 @@ import profile from './image/a.jpg'
 import { FiMail } from "react-icons/fi";
 import { FiLock } from "react-icons/fi";
 import { Button } from "antd";
+import RegisterForm from './RegisterForm';
 
 function LoginForm({Loginuser,error}) {
     const [detailslogin,setDetailslogin]=useState({name:"",email:"",password:""});
@@ -11,7 +12,8 @@ function LoginForm({Loginuser,error}) {
 
         Loginuser(detailslogin); 
     }
-    const OnButtonClick = (e) => {
+    const OnButtonClick = () => {
+      <RegisterForm/>
       console.log("Button clicked");
     };
   return (
@@ -43,7 +45,7 @@ function LoginForm({Loginuser,error}) {
             <Button className='button-login' onClick={submitHandler}>
             Login
           </Button>
-          <Button className='button-reg'onClick={OnButtonClick}>
+          <Button className='button-reg'  onClick={OnButtonClick}>
           Register
           </Button>
         </div>

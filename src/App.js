@@ -34,16 +34,16 @@ function App() {
         .then((response) => {
             localStorage.setItem('userData', JSON.stringify(response.data));
           console.log(response);
-        if (/*{response.data.role=="User"&&}*/response.status == 200) {
+        if (response.data.role=="User"&&response.status == 200) {
             console.log("Logged in");
             axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
             setUserlogin({
               email: detailslogin.email,
             });
           }
-          // else if(response.data.role!="User"){
-          //   console.log(response.data.role)
-          // }
+          else if(response.data.role!="User"){
+            console.log(response.data.role)
+          }
         })
         .catch((err) => {
           console.log(err);

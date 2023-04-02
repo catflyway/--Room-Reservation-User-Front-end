@@ -310,12 +310,12 @@ tr:hover{
 }
 .searchgraph{
   display: inline-flex;
-  padding: 15px 20% 0px 25%;
+  padding: 0px 20% 0px 20%;
   margin-top: 20px;
 }
 .searchgraphdate{
   display: inline-flex;
-  padding: 10px 20% 0px 35%;
+  padding: 15px 20% 0px 20%;
 }
 .dategraph{
   margin-right: 20px;
@@ -345,6 +345,18 @@ tr:hover{
   font-size: 2rem;
   color: #3F478D;
   padding: 20px 20px 20px 45%;
+}
+.Heard-Manageano {
+  width: 100%;
+  display: inline-flex;
+  font-size: 1.5rem;
+  padding: 10px 10px 10px 45%;
+}
+.Profilehead{
+  width: 100%;
+  display: inline-flex;
+  font-size: 1rem;
+  padding: 0px 0px 10px 48%;
 }
 
 .button-organization{
@@ -402,4 +414,14 @@ tr:hover{
   background-color: #3F478D;
   font-size: 18px;
   border: none;
+}
+.imgprofile{
+  display: block;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+}
+.imgprofilebor{
+  border-radius: 30%;
 }
