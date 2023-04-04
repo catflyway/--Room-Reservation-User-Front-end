@@ -8,6 +8,9 @@ function RegisterForm() {
 
   return (
     <div className='App'>
+    <p>
+      ผ่านค้าาาาาาาาาาาาา
+    </p>
    
     </div>
   )
