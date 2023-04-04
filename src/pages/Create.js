@@ -1,26 +1,24 @@
-import React, { useState,useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
   Select,
-  DatePicker,Col,Row, Button,TimePicker,Radio,Space,Checkbox,Segmented,Result
-} from 'antd';
+  DatePicker,
+  Col,
+  Row,
+  Button,
+  TimePicker,
+  Radio,
+  Space,
+  Checkbox,
+  Segmented,
+  Result,
+} from "antd";
 import dayjs from "dayjs";
-import axios from 'axios';
-import { SmileOutlined } from '@ant-design/icons';
-
-
+import axios from "axios";
+import { SmileOutlined } from "@ant-design/icons";
 
 function Create() {
-  const OnButtonClick = () => {
-    console.log("Button clicked");
-    <Result
-    icon={<SmileOutlined />}
-    title="Great, we have done all the operations!"
-    extra={<Button type="primary">Next</Button>}
-  />
-  };
-
   const [data, setData] = useState({
     Room: "",
     Building: "",
@@ -29,7 +27,7 @@ function Create() {
     endTime: [],
     allDay: false,
     Purpose: "",
-    repeatPattern:"",
+    repeatDate: "",
   });
   const [orgList, setOrgList] = useState([]);
   function getOrg() {
@@ -52,16 +50,12 @@ function Create() {
       setRoomsList(response.data);
     });
   }
-  const [usersList, setUsersList] = useState(()=>{
-    let toto=localStorage.getItem("userData");
-    return JSON.parse(toto).firstname
+  const [usersFirstname, setUsersFirstname] = useState(() => {
+    let toto = localStorage.getItem("userData");
+    let userProfle = JSON.parse(toto);
+    setData({ ...data, UserID: userProfle._id });
+    return userProfle.firstname;
   });
-  // function getUsersInOrgID(id) {
-  //   axios.get("/org/user/" + id).then((response) => {
-  //     console.log(response);
-  //     setUsersList(response.data);
-  //   });
-  // }
 
   useEffect(() => {
     getOrg();
@@ -71,36 +65,48 @@ function Create() {
     console.log(`selected ${orgID}`);
     getBuildingInOrgID(orgID);
 
-    setData({ ...data, OrgID: orgID })
+    setData({ ...data, OrgID: orgID });
   };
   const onChangebuild = (buildingID) => {
     console.log(`selected ${buildingID}`);
-    getRoomsInOrgID(buildingID)
+    getRoomsInOrgID(buildingID);
 
-    setData({ ...data, buildingID: buildingID })
+    setData({ ...data, buildingID: buildingID });
   };
-  
-  
+  const [datainvalid, setdatainvalid] = useState(true);
+
+  const [Clickcreate, setClickcreate] = useState(true);
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post("/Requests", data).then((response) => {
-      console.log(response.data);
-    });
+    // axios.post("/Requests", data).then((response) => {
+    //   console.log(response.data);
+    // });
     console.log(data);
+    // setClickcreate(false);
+  };
+  const Clicknext = (e) => {
+    setClickcreate(true);
+    console.log("5555");
   };
 
-  const datOfWeekString = ["SU","MO", "TU", "WE", "TH", "FR", "SA"];
+  const datOfWeekString = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 
   const [isAllDay, setIsAllDay] = useState(true);
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
-  const [timeRange, setTimeRange] = useState([0, 24*60]);
+  const [timeRange, setTimeRange] = useState([0, 24 * 60]);
   const [weekDay, setWeekDay] = useState();
   const [repeatPattern, setRepeatPattern] = useState("norepeat");
 
   const onChangeTimeRange = (timesrt, timeString) => {
-    let startDiff = timesrt[0]?.diff(timesrt[0].clone().startOf("day"), "minute");
-    let stopDiff = timesrt[1]?.diff(timesrt[1].clone().startOf("day"), "minute");
+    let startDiff = timesrt[0]?.diff(
+      timesrt[0].clone().startOf("day"),
+      "minute"
+    );
+    let stopDiff = timesrt[1]?.diff(
+      timesrt[1].clone().startOf("day"),
+      "minute"
+    );
     setTimeRange([startDiff, stopDiff]);
   };
 
@@ -118,10 +124,14 @@ function Create() {
 
   React.useEffect(() => {
     let getTimeRange = (day) => {
-      let start = [day.clone().add(timeRange[0], "minute").format("YYYY-MM-DDTHH:mm:ssZ")];
-      let end   = [day.clone().add(timeRange[1], "minute").format("YYYY-MM-DDTHH:mm:ssZ")];
+      let start = [
+        day.clone().add(timeRange[0], "minute").format("YYYY-MM-DDTHH:mm:ssZ"),
+      ];
+      let end = [
+        day.clone().add(timeRange[1], "minute").format("YYYY-MM-DDTHH:mm:ssZ"),
+      ];
       return [start, end];
-    }
+    };
 
     let getTimeRangeInterval = (interval) => {
       let startTime = [];
@@ -135,159 +145,230 @@ function Create() {
       }
 
       return [startTime, endTime];
-    }
+    };
 
     let startTime = [];
     let endTime = [];
-  
+
     if (startDate && timeRange && repeatPattern == "norepeat") {
       let range = getTimeRange(startDate);
       startTime = [range[0]];
       endTime = [range[1]];
-    }
-    else if (startDate && endDate && timeRange && repeatPattern == "days") {
+    } else if (startDate && endDate && timeRange && repeatPattern == "days") {
       [startTime, endTime] = getTimeRangeInterval(1);
-    }
-    else if (startDate && endDate && timeRange && repeatPattern == "weeks") {
+    } else if (startDate && endDate && timeRange && repeatPattern == "weeks") {
       [startTime, endTime] = getTimeRangeInterval(7);
     }
-  
-    setData({ ...data, allDay: isAllDay, startTime, endTime });
+
+    setData({
+      ...data,
+      allDay: isAllDay,
+      repeatDate: repeatPattern,
+      startTime,
+      endTime,
+    });
   }, [repeatPattern, startDate, endDate, timeRange]);
 
-   
   return (
     <div className="App">
-    <div className="User-list">
-    <div className="Heard-Manageano">
-        <h1>Create</h1>
+      <div className="User-list">
+        <div className="Heard-Manageano">
+          <h1>Create</h1>
         </div>
-        <Row>
-      <Col span={12} offset={6}>
-      <Form
-      labelCol={{
-        span: 6,
-      }}
+        {Clickcreate == true ? (
+          <>
+            <Row>
+              <Col span={12} offset={6}>
+                <Form
+                  labelCol={{
+                    span: 6,
+                  }}
+                  wrapperCol={{
+                    span: 18,
+                  }}
+                  layout="horizontal"
+                >
+                  <Form.Item
+                    label="หน่วยงาน"
+                    name="gender"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your username!",
+                      },
+                    ]}
+                  >
+                    <Select
+                      showSearch
+                      placeholder="หน่วยงาน"
+                      optionFilterProp="children"
+                      onChange={onChangeorg}
+                      filterOption={(input, option) =>
+                        (option?.name ?? "")
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      fieldNames={{ label: "name", value: "_id" }}
+                      options={orgList}
+                    />
+                  </Form.Item>
+                  <Form.Item label="อาคาร/สถานที่">
+                    <Select
+                      showSearch
+                      placeholder="อาคาร/สถานที่"
+                      optionFilterProp="children"
+                      onChange={onChangebuild}
+                      filterOption={(input, option) =>
+                        (option?.name ?? "")
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      fieldNames={{ label: "name", value: "_id" }}
+                      options={buildingList}
+                    />
+                  </Form.Item>
+                  <Form.Item label="ห้อง">
+                    <Select
+                      showSearch
+                      placeholder="ห้อง"
+                      optionFilterProp="children"
+                      onChange={(value) => setData({ ...data, Room: value })}
+                      filterOption={(input, option) =>
+                        (option?.Name ?? "")
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      fieldNames={{ label: "Name", value: "_id" }}
+                      options={roomsList}
+                    />
+                  </Form.Item>
+                  <Form.Item label="เวลาการจอง">
+                    <Space direction="vertical">
+                      <Checkbox
+                        checked={isAllDay}
+                        onChange={(e) => setIsAllDay(e.target.checked)}
+                      >
+                        Allday
+                      </Checkbox>
+                      {!isAllDay ? (
+                        <TimePicker.RangePicker
+                          onChange={onChangeTimeRange}
+                          format="HH:mm"
+                        />
+                      ) : (
+                        ""
+                      )}
+                    </Space>
+                  </Form.Item>
+                  <Form.Item label="วันจอง">
+                    <Space direction="vertical">
+                      <DatePicker
+                        placeholder="เริ่มจอง"
+                        onChange={(date) =>
+                          setStartDate(date?.clone().startOf("day"))
+                        }
+                        value={startDate}
+                        disabledDate={(value) =>
+                          value && value < dayjs().endOf("day")
+                        }
+                      />
+                      <Radio.Group
+                        value={repeatPattern}
+                        onChange={(e) => setRepeatPattern(e.target.value)}
+                      >
+                        <Radio.Button value="norepeat">
+                          Does not repeat
+                        </Radio.Button>
+                        <Radio.Button value="days">everyday</Radio.Button>
+                        <Radio.Button value="weeks">everyweek</Radio.Button>
+                      </Radio.Group>
+                      {repeatPattern == "days" ? (
+                        <DatePicker
+                          onChange={(date) =>
+                            setEndDate(
+                              date?.clone().add(1, "day").startOf("day")
+                            )
+                          }
+                          placeholder="วันสิ้นการจอง"
+                          disabledDate={(value) => value && value < startDate}
+                        />
+                      ) : repeatPattern == "weeks" ? (
+                        <>
+                          <Segmented
+                            size="large"
+                            options={datOfWeekString}
+                            value={weekDay}
+                            disabled
+                          />
+                          <DatePicker
+                            onChange={(date) =>
+                              setEndDate(
+                                date?.clone().add(1, "day").startOf("day")
+                              )
+                            }
+                            placeholder="วันสิ้นสุดสัปดาห์"
+                            disabledDate={(value) =>
+                              value &&
+                              (value < startDate ||
+                                value.day() != startDate.day())
+                            }
+                          />
+                        </>
+                      ) : (
+                        ""
+                      )}
+                    </Space>
+                  </Form.Item>
+                  <Form.Item label="ผู้จอง">
+                    <Input
+                      placeholder="ผู้จอง"
+                      disabled
+                      value={usersFirstname}
+                    />
+                  </Form.Item>
+                  <Form.Item label="วัตถุประสงค์">
+                    <Input
+                      placeholder="วัตถุประสงค์"
+                      onChange={(e) =>
+                        setData({ ...data, Purpose: e.target.value })
+                      }
+                      value={data?.Purpose}
+                    />
+                  </Form.Item>
+                  <Form.Item
       wrapperCol={{
-        span: 18,
+        offset: 8,
+        span: 16,
       }}
-      layout="horizontal"
     >
-      <Form.Item label="หน่วยงาน">
-        <Select
-          showSearch
-          placeholder="หน่วยงาน"
-          optionFilterProp="children"
-          onChange={onChangeorg}
-          filterOption={(input, option) =>
-            (option?.name ?? "").toLowerCase().includes(input.toLowerCase())
-          }
-          fieldNames={{ label: "name", value: "_id" }}
-          options={orgList}
-        />
-      </Form.Item>
-      <Form.Item label="อาคาร/สถานที่">
-        <Select
-          showSearch
-          placeholder="อาคาร/สถานที่"
-          optionFilterProp="children"
-          onChange={onChangebuild}
-          filterOption={(input, option) =>
-            (option?.name ?? "").toLowerCase().includes(input.toLowerCase())
-          }
-          fieldNames={{ label: "name", value: "_id" }}
-          options={buildingList}
-        />
-      </Form.Item>
-      <Form.Item label="ห้อง">
-        <Select
-          showSearch
-          placeholder="ห้อง"
-          optionFilterProp="children"
-          onChange={value => setData({ ...data, Room: value })}
-          filterOption={(input, option) =>
-            (option?.Name ?? "").toLowerCase().includes(input.toLowerCase())
-          }
-          fieldNames={{ label: "Name", value: "_id" }}
-          options={roomsList}
-        />
-      </Form.Item>
-      <Form.Item label="เวลาการจอง">
-        <Space direction="vertical">
-          <Checkbox checked={isAllDay} onChange={(e) => setIsAllDay(e.target.checked)}>
-            Allday
-          </Checkbox>
-          {!isAllDay ? (
-            <TimePicker.RangePicker
-              onChange={onChangeTimeRange}
-              format="HH:mm"
-            />
-          ) : (
-            ""
-          )}
-        </Space>
-      </Form.Item>
-      <Form.Item label="วันจอง">
-        <Space direction="vertical">
-          <DatePicker
-            placeholder="เริ่มจอง"
-            onChange={(date) => setStartDate(date?.clone().startOf("day"))}
-            value={startDate}
-            disabledDate={(value) => (value && value < dayjs().endOf("day"))}
+      <Button type="primary" htmlType="submit">
+      สร้างการจอง
+      </Button>
+    </Form.Item>
+                </Form>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={11}></Col>
+              <Col span={2}>
+                <Button type="primary" onClick={handleSubmit}>
+                  สร้างการจอง
+                </Button>
+              </Col>
+              <Col span={11}></Col>
+            </Row>
+          </>
+        ) : (
+          <Result
+            icon={<SmileOutlined />}
+            title="Great, we have done all the operations!"
+            extra={
+              <Button type="primary" onClick={Clicknext}>
+                Next
+              </Button>
+            }
           />
-          <Radio.Group value={repeatPattern} onChange={(e) => setRepeatPattern(e.target.value)}>
-            <Radio.Button value="norepeat">Does not repeat</Radio.Button>
-            <Radio.Button value="days">everyday</Radio.Button>
-            <Radio.Button value="weeks">everyweek</Radio.Button>
-          </Radio.Group>
-          {repeatPattern == "days" ? (
-            <DatePicker
-              onChange={(date) => setEndDate(date?.clone().add(1, 'day').startOf("day"))}
-              placeholder="วันสิ้นการจอง"
-              disabledDate={(value) => (value && value < startDate)}
-            />
-          ) : repeatPattern == "weeks" ? (
-            <>
-              <Segmented
-                size="large"
-                options={datOfWeekString}
-                value={weekDay}
-                disabled
-              />
-              <DatePicker
-                onChange={(date) => setEndDate(date?.clone().add(1, 'day').startOf("day"))}
-                placeholder="วันสิ้นสุดสัปดาห์"
-                disabledDate={(value) => (value && (value < startDate || value.day() != startDate.day()))}
-              />
-            </>
-          ) : (
-            ""
-          )}
-        </Space>
-      </Form.Item>
-      <Form.Item label="ผู้จอง">
-      <Input
-          placeholder="ผู้จอง"
-          disabled 
-          value={usersList}
-        />
-        </Form.Item>
-      <Form.Item label="วัตถุประสงค์">
-        <Input
-          placeholder="วัตถุประสงค์"
-          onChange={(e) => setData({ ...data, Purpose: e.target.value })}
-          value={data?.Purpose}
-        />
-      </Form.Item>
-    </Form>
-      </Col>
-    </Row>
-    <Row>
-    <Col span={11}></Col>
-      <Col span={2} ><Button type='primary' onClick={handleSubmit}>สร้างการจอง</Button></Col>
-      <Col span={11}></Col>
-      
-    </Row>
+        )}
       </div>
     </div>
   );
