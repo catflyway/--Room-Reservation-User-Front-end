@@ -63,8 +63,8 @@ const handleCancel = () => {
       </Row>
       <Row>
         <Col span={24}>
-        <div className="searchgraph">
-        <div className="searchstatus">
+        <div className="searchgraphdate">
+        <div className='searches'>
         Organization : {" "}
           <Select
             showSearch
@@ -86,7 +86,7 @@ const handleCancel = () => {
             <Option value="4">ตึกB</Option>
           </Select>
           </div>
-          <div className='searchstatus'>
+          <div className='searches'>
           Building : {" "}
           <Select
             showSearch
@@ -108,7 +108,7 @@ const handleCancel = () => {
             <Option value="4">ตึกB</Option>
           </Select>
           </div>
-          <div className='searchstatus'>
+          <div className='searches'>
           Room : {" "}
           <Select
             showSearch

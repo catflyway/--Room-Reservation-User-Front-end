@@ -31,11 +31,12 @@ useEffect(() => {
   return (
     <div className="App">
       <div className="User-list">
+      <div className="Heard-Manageano">
         <h1>Rooms</h1>
+        </div>
         <div className="searchgraph">
-        <div className="searchstatus">
         <div className='searches'>
-        Organizationtype : {" "}
+        Organization : {" "}
           <Select
             showSearch
             style={{
@@ -101,7 +102,6 @@ useEffect(() => {
           </Select>
           </div>
         </div>
-        </div>
         <div className="User-list-heard">
         <List
     dataSource={dataSource}
@@ -115,7 +115,7 @@ useEffect(() => {
       </List.Item>
     )}
   />
-  <Modal title='' open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+  <Modal title='รายละเอียดห้อง' open={isModalOpen} footer={null} onCancel={handleCancel}>
         <p>Some contents...</p>
         <p>Some contents...</p>
         <p>Some contents...</p>
