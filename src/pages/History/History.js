@@ -1,6 +1,7 @@
 import React, { useState} from 'react';
 import  {Tabs,Col,Row,List,Typography}  from 'antd';
 import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 const data = [
   'จอง1',
@@ -40,16 +41,33 @@ function History() {
       children: `Content of Tab Pane 3`,
     },
   ];
- 
+  const [requserList, setrequserList] = useState([]);
+  function getReq(id) {
+    axios.get("requests/searchby?UserID="+id).then((response) => {
+      console.log(response);
+      setrequserList(response.data);
+    });
+  }
+  const [orgList, setOrgList] = useState([]);
+  function getOrg() {
+    axios.get("/org").then((response) => {
+      console.log(response);
+      setOrgList(response.data);
+    });
+  }
   return (
     <div className="App-history">
+     <div className="User-list">
+    <div className="Heard-Manageano">
         <h1>History</h1>
+        </div>
         <Row>
       <Col span={12} offset={6}>
       <Tabs defaultActiveKey="1" items={items} onChange={onChange} size='large' />
         </Col>
         </Row>
       
+    </div>
     </div>
   );
 }
