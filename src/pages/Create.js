@@ -73,7 +73,6 @@ function Create() {
 
     setData({ ...data, buildingID: buildingID });
   };
-  const [datainvalid, setdatainvalid] = useState(true);
 
   const [Clickcreate, setClickcreate] = useState(true);
   const handleSubmit = (e) => {
@@ -190,7 +189,7 @@ function Create() {
                 >
                   <Form.Item
                     label="หน่วยงาน"
-                    name="gender"
+                    name="หน่วยงาน"
                     rules={[
                       {
                         required: true,
@@ -212,7 +211,14 @@ function Create() {
                       options={orgList}
                     />
                   </Form.Item>
-                  <Form.Item label="อาคาร/สถานที่">
+                  <Form.Item label="อาคาร/สถานที่"
+                  name="อาคาร/สถานที่"
+                   rules={[
+                      {
+                        required: true,
+                        message: "Please input your username!",
+                      },
+                    ]}>
                     <Select
                       showSearch
                       placeholder="อาคาร/สถานที่"
@@ -227,7 +233,14 @@ function Create() {
                       options={buildingList}
                     />
                   </Form.Item>
-                  <Form.Item label="ห้อง">
+                  <Form.Item label="ห้อง"
+                   name="ห้อง"
+                   rules={[
+                      {
+                        required: true,
+                        message: "Please input your username!",
+                      },
+                    ]}>
                     <Select
                       showSearch
                       placeholder="ห้อง"
@@ -245,16 +258,23 @@ function Create() {
                   <Form.Item label="เวลาการจอง">
                     <Space direction="vertical">
                       <Checkbox
+                        name="TimeRange"
                         checked={isAllDay}
                         onChange={(e) => setIsAllDay(e.target.checked)}
                       >
                         Allday
                       </Checkbox>
-                      {!isAllDay ? (
+                      {!isAllDay ? ( <Form.Item name="ห้อง"
+                   rules={[
+                      {
+                        required: true,
+                        message: "Please input your username!",
+                      },
+                    ]}>
                         <TimePicker.RangePicker
                           onChange={onChangeTimeRange}
                           format="HH:mm"
-                        />
+                        /></Form.Item>
                       ) : (
                         ""
                       )}
@@ -262,6 +282,13 @@ function Create() {
                   </Form.Item>
                   <Form.Item label="วันจอง">
                     <Space direction="vertical">
+                    <Form.Item name="ห้อง"
+                   rules={[
+                      {
+                        required: true,
+                        message: "Please input your username!",
+                      },
+                    ]}>
                       <DatePicker
                         placeholder="เริ่มจอง"
                         onChange={(date) =>
@@ -271,7 +298,7 @@ function Create() {
                         disabledDate={(value) =>
                           value && value < dayjs().endOf("day")
                         }
-                      />
+                      /></Form.Item>
                       <Radio.Group
                         value={repeatPattern}
                         onChange={(e) => setRepeatPattern(e.target.value)}
@@ -283,6 +310,13 @@ function Create() {
                         <Radio.Button value="weeks">everyweek</Radio.Button>
                       </Radio.Group>
                       {repeatPattern == "days" ? (
+                        <Form.Item name="ห้อง"
+                   rules={[
+                      {
+                        required: true,
+                        message: "Please input your username!",
+                      },
+                    ]}>
                         <DatePicker
                           onChange={(date) =>
                             setEndDate(
@@ -291,7 +325,7 @@ function Create() {
                           }
                           placeholder="วันสิ้นการจอง"
                           disabledDate={(value) => value && value < startDate}
-                        />
+                        /></Form.Item>
                       ) : repeatPattern == "weeks" ? (
                         <>
                           <Segmented
@@ -300,6 +334,13 @@ function Create() {
                             value={weekDay}
                             disabled
                           />
+                          <Form.Item name="ห้อง"
+                   rules={[
+                      {
+                        required: true,
+                        message: "Please input your username!",
+                      },
+                    ]}>
                           <DatePicker
                             onChange={(date) =>
                               setEndDate(
@@ -312,7 +353,7 @@ function Create() {
                               (value < startDate ||
                                 value.day() != startDate.day())
                             }
-                          />
+                          /></Form.Item>
                         </>
                       ) : (
                         ""
@@ -326,7 +367,14 @@ function Create() {
                       value={usersFirstname}
                     />
                   </Form.Item>
-                  <Form.Item label="วัตถุประสงค์">
+                  <Form.Item label="วัตถุประสงค์"
+                  name="วัตถุประสงค์"
+                   rules={[
+                      {
+                        required: true,
+                        message: "Please input your Purpose!",
+                      },
+                    ]}>
                     <Input
                       placeholder="วัตถุประสงค์"
                       onChange={(e) =>
