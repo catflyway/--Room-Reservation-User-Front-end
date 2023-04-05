@@ -75,13 +75,13 @@ function Create() {
   };
 
   const [Clickcreate, setClickcreate] = useState(true);
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // axios.post("/Requests", data).then((response) => {
-    //   console.log(response.data);
-    // });
+  const handleSubmit = (value) => {
+    console.log(value)
+    axios.post("/Requests", data).then((response) => {
+      console.log(response.data);
+    });
     console.log(data);
-    // setClickcreate(false);
+    setClickcreate(false);
   };
   const Clicknext = (e) => {
     setClickcreate(true);
@@ -186,6 +186,7 @@ function Create() {
                     span: 18,
                   }}
                   layout="horizontal"
+                  onFinish={handleSubmit}
                 >
                   <Form.Item
                     label="หน่วยงาน"
@@ -211,14 +212,16 @@ function Create() {
                       options={orgList}
                     />
                   </Form.Item>
-                  <Form.Item label="อาคาร/สถานที่"
-                  name="อาคาร/สถานที่"
-                   rules={[
+                  <Form.Item
+                    label="อาคาร/สถานที่"
+                    name="อาคาร/สถานที่"
+                    rules={[
                       {
                         required: true,
                         message: "Please input your username!",
                       },
-                    ]}>
+                    ]}
+                  >
                     <Select
                       showSearch
                       placeholder="อาคาร/สถานที่"
@@ -233,14 +236,16 @@ function Create() {
                       options={buildingList}
                     />
                   </Form.Item>
-                  <Form.Item label="ห้อง"
-                   name="ห้อง"
-                   rules={[
+                  <Form.Item
+                    label="ห้อง"
+                    name="ห้อง"
+                    rules={[
                       {
                         required: true,
                         message: "Please input your username!",
                       },
-                    ]}>
+                    ]}
+                  >
                     <Select
                       showSearch
                       placeholder="ห้อง"
@@ -264,17 +269,21 @@ function Create() {
                       >
                         Allday
                       </Checkbox>
-                      {!isAllDay ? ( <Form.Item name="ห้อง"
-                   rules={[
-                      {
-                        required: true,
-                        message: "Please input your username!",
-                      },
-                    ]}>
-                        <TimePicker.RangePicker
-                          onChange={onChangeTimeRange}
-                          format="HH:mm"
-                        /></Form.Item>
+                      {!isAllDay ? (
+                        <Form.Item
+                          name="time"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please input your username!",
+                            },
+                          ]}
+                        >
+                          <TimePicker.RangePicker
+                            onChange={onChangeTimeRange}
+                            format="HH:mm"
+                          />
+                        </Form.Item>
                       ) : (
                         ""
                       )}
@@ -282,23 +291,26 @@ function Create() {
                   </Form.Item>
                   <Form.Item label="วันจอง">
                     <Space direction="vertical">
-                    <Form.Item name="ห้อง"
-                   rules={[
-                      {
-                        required: true,
-                        message: "Please input your username!",
-                      },
-                    ]}>
-                      <DatePicker
-                        placeholder="เริ่มจอง"
-                        onChange={(date) =>
-                          setStartDate(date?.clone().startOf("day"))
-                        }
-                        value={startDate}
-                        disabledDate={(value) =>
-                          value && value < dayjs().endOf("day")
-                        }
-                      /></Form.Item>
+                      <Form.Item
+                        name="startDate"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input your username!",
+                          },
+                        ]}
+                      >
+                        <DatePicker
+                          placeholder="เริ่มจอง"
+                          onChange={(date) =>
+                            setStartDate(date?.clone().startOf("day"))
+                          }
+                          value={startDate}
+                          disabledDate={(value) =>
+                            value && value < dayjs().endOf("day")
+                          }
+                        />
+                      </Form.Item>
                       <Radio.Group
                         value={repeatPattern}
                         onChange={(e) => setRepeatPattern(e.target.value)}
@@ -310,22 +322,25 @@ function Create() {
                         <Radio.Button value="weeks">everyweek</Radio.Button>
                       </Radio.Group>
                       {repeatPattern == "days" ? (
-                        <Form.Item name="ห้อง"
-                   rules={[
-                      {
-                        required: true,
-                        message: "Please input your username!",
-                      },
-                    ]}>
-                        <DatePicker
-                          onChange={(date) =>
-                            setEndDate(
-                              date?.clone().add(1, "day").startOf("day")
-                            )
-                          }
-                          placeholder="วันสิ้นการจอง"
-                          disabledDate={(value) => value && value < startDate}
-                        /></Form.Item>
+                        <Form.Item
+                          name="endDate"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please input your username!",
+                            },
+                          ]}
+                        >
+                          <DatePicker
+                            onChange={(date) =>
+                              setEndDate(
+                                date?.clone().add(1, "day").startOf("day")
+                              )
+                            }
+                            placeholder="วันสิ้นการจอง"
+                            disabledDate={(value) => value && value < startDate}
+                          />
+                        </Form.Item>
                       ) : repeatPattern == "weeks" ? (
                         <>
                           <Segmented
@@ -334,26 +349,29 @@ function Create() {
                             value={weekDay}
                             disabled
                           />
-                          <Form.Item name="ห้อง"
-                   rules={[
-                      {
-                        required: true,
-                        message: "Please input your username!",
-                      },
-                    ]}>
-                          <DatePicker
-                            onChange={(date) =>
-                              setEndDate(
-                                date?.clone().add(1, "day").startOf("day")
-                              )
-                            }
-                            placeholder="วันสิ้นสุดสัปดาห์"
-                            disabledDate={(value) =>
-                              value &&
-                              (value < startDate ||
-                                value.day() != startDate.day())
-                            }
-                          /></Form.Item>
+                          <Form.Item
+                            name="endDate"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Please input your username!",
+                              },
+                            ]}
+                          >
+                            <DatePicker
+                              onChange={(date) =>
+                                setEndDate(
+                                  date?.clone().add(1, "day").startOf("day")
+                                )
+                              }
+                              placeholder="วันสิ้นสุดสัปดาห์"
+                              disabledDate={(value) =>
+                                value && startDate &&
+                                (value < startDate ||
+                                  value.day() != startDate.day())
+                              }
+                            />
+                          </Form.Item>
                         </>
                       ) : (
                         ""
@@ -367,14 +385,16 @@ function Create() {
                       value={usersFirstname}
                     />
                   </Form.Item>
-                  <Form.Item label="วัตถุประสงค์"
-                  name="วัตถุประสงค์"
-                   rules={[
+                  <Form.Item
+                    label="วัตถุประสงค์"
+                    name="วัตถุประสงค์"
+                    rules={[
                       {
                         required: true,
                         message: "Please input your Purpose!",
                       },
-                    ]}>
+                    ]}
+                  >
                     <Input
                       placeholder="วัตถุประสงค์"
                       onChange={(e) =>
@@ -384,26 +404,25 @@ function Create() {
                     />
                   </Form.Item>
                   <Form.Item
-      wrapperCol={{
-        offset: 8,
-        span: 16,
-      }}
-    >
-      <Button type="primary" htmlType="submit">
-      สร้างการจอง
-      </Button>
-    </Form.Item>
+                    wrapperCol={{
+                      offset: 8,
+                      span: 16,
+                    }}
+                  >
+                    <Row>
+                      <Col span={8}></Col>
+                      <Col span={2}>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                        >
+                          สร้างการจอง
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Form.Item>
                 </Form>
               </Col>
-            </Row>
-            <Row>
-              <Col span={11}></Col>
-              <Col span={2}>
-                <Button type="primary" onClick={handleSubmit}>
-                  สร้างการจอง
-                </Button>
-              </Col>
-              <Col span={11}></Col>
             </Row>
           </>
         ) : (
