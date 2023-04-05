@@ -76,6 +76,11 @@ function History() {
       key: 'Room',
     },
     {
+      title: 'Purpose',
+      dataIndex: 'Purpose',
+      key: 'Purpose',
+    },
+    {
       key: "Actions",
       title: "Actions",
       render: (record) => {
@@ -197,7 +202,7 @@ const [data, setData] = useState({
         <h1>History</h1>
         </div>
         <Row>
-      <Col span={12} offset={6}>
+      <Col span={14} offset={6}>
       <Tabs defaultActiveKey="1" items={items} onChange={onChange} size='large' />
         </Col>
         </Row>
