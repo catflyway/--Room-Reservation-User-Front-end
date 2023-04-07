@@ -76,7 +76,7 @@ function Create() {
 
   const [Clickcreate, setClickcreate] = useState(true);
   const handleSubmit = (value) => {
-    console.log(value)
+    console.log(value);
     axios.post("/Requests", data).then((response) => {
       console.log(response.data);
     });
@@ -366,7 +366,8 @@ function Create() {
                               }
                               placeholder="วันสิ้นสุดสัปดาห์"
                               disabledDate={(value) =>
-                                value && startDate &&
+                                value &&
+                                startDate &&
                                 (value < startDate ||
                                   value.day() != startDate.day())
                               }
@@ -412,10 +413,7 @@ function Create() {
                     <Row>
                       <Col span={8}></Col>
                       <Col span={2}>
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                        >
+                        <Button type="primary" htmlType="submit">
                           สร้างการจอง
                         </Button>
                       </Col>

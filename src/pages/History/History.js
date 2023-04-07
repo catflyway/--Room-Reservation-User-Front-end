@@ -89,20 +89,12 @@ function History() {
       title: "Actions",
       render: (record) => {
         return (
-          <>
-            <EditOutlined
-              onClick={() => {
-                onEditStudent(record);
-              }}
-              style={{ color: "blue", marginLeft: 12 }}
-            />
             <DeleteOutlined
               onClick={() => {
                 onDeleteStudent(record);
               }}
               style={{ color: "red", marginLeft: 12 }}
             />
-          </>
         );
       },
     },
