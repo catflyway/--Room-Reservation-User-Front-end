@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useContext } from "react";
 import { Form, Input, Select, Button, Row, Col, Image } from "antd";
 import axios from "axios";
+import { UserContext } from "../user-context";
 
 function Profile() {
+  const userData = useContext(UserContext);
   const OnButtonClick = (e) => {
     console.log("Button clicked");
   };
@@ -14,8 +16,19 @@ function Profile() {
       setDataSource(response.data);
     });
   }
+    const [statuslist, setstatuslist] = useState([]);
+  function getStatus() {
+    console.log(userData)
+    axios
+      .get("/org/status/" + userData.org.id, { crossdomain: true })
+      .then((response) => {
+        console.log(response);
+        setstatuslist(response.data);
+      });
+  }
   useEffect(() => {
     getManageReq();
+    getStatus()
   }, []);
   const [user, setUser] = useState({});
   const Logout = () => {
@@ -75,16 +88,21 @@ function Profile() {
                   value={dataSource?.password}
                 />
               </Form.Item>
-              <Form.Item label="Status">
-                <Select
-                  placeholder="Select a Status"
-                  value={dataSource?.status}
-                >
-                  <Select.Option value="student">Student</Select.Option>
-                  <Select.Option value="teacher">Teacher</Select.Option>
-                  <Select.Option value="athlete">Athlete</Select.Option>
-                </Select>
-              </Form.Item>
+              <Form.Item label="Status" value={dataSource?.status}>
+              <Select
+                showSearch
+                placeholder="Status"
+                optionFilterProp="children"
+                value={dataSource?.status?.name}
+                filterOption={(input, option) =>
+                  (option?.name ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                fieldNames={{ label: "name", value: "_id" }}
+                options={statuslist}
+              />
+            </Form.Item>
             </Form>
           </Col>
         </Row>

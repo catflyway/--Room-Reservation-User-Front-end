@@ -38,9 +38,8 @@ function App() {
       .post("/auth/login", detailslogin)
 
       .then((response) => {
-        console.log(response);
-        if (response.status != 200) {
-          throw "Response not 200";
+        if (response.status !== 200) {
+          throw new Error("Response not 200");
         }
 
         if (allowRole.includes(response.data.role)) {
@@ -48,9 +47,9 @@ function App() {
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${response.data.token}`;
-          setUserlogin({
-            email: detailslogin.email,
-          });
+          setUserlogin(
+            response.data
+          );
 
           localStorage.setItem("userData", JSON.stringify(response.data));
         } else {
@@ -66,7 +65,7 @@ function App() {
   };
   return (
     <UserContext.Provider value={userlogin}>
-      {userlogin.email != "" ? (
+      {userlogin.email !== "" ? (
         <BrowserRouter>
           <Navbar />
           <Routes>
