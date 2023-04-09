@@ -1,5 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Avatar, Button, List, Modal, Select } from "antd";
+import {
+  Avatar,
+  Button,
+  List,
+  Modal,
+  Select,
+  Form,
+  Image,
+  Row,
+  Col,
+  Descriptions,
+  Card,
+} from "antd";
 import axios from "axios";
 import { UserContext } from "../user-context";
 
@@ -19,15 +31,13 @@ function Room() {
   }
   useEffect(() => {
     getRoom();
-    console.log("user", user);
   }, []);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModal = () => {
+  const [modalData, setModalData] = useState();
+  const showModal = (item) => {
+    setModalData(item);
     setIsModalOpen(true);
-  };
-  const handleOk = () => {
-    setIsModalOpen(false);
   };
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -124,15 +134,15 @@ function Room() {
                     />
                   }
                   title={
-                    <Button type="primary" onClick={showModal}>
+                    <Button type="primary" onClick={() => showModal(item)}>
                       {item.Name}
                     </Button>
                   }
                   description={
                     <p>
-                      Building : {item.Building}
+                      Building : {item.Building.name}
                       <br />
-                      RoomType : {item.RoomType}
+                      RoomType : {item.RoomType.name}
                       <br />
                       Seat : {item.Seat}
                     </p>
@@ -142,14 +152,66 @@ function Room() {
             )}
           />
           <Modal
-            title="รายละเอียดห้อง"
+            title={<>รายละเอียดห้อง {modalData?.Name}</>}
             open={isModalOpen}
             footer={null}
             onCancel={handleCancel}
           >
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
+            <Row justify="center">
+              <Card
+                hoverable
+                bodyStyle={{padding: "0"}}
+              >
+                <Image
+                  className="imgprofilebor"
+                  preview={false}
+                  width={200}
+                  height={200}
+                  src={modalData?.image?.url}
+                />
+              </Card>
+            </Row>
+
+            <br />
+
+            <Descriptions bordered column={1} size={"middle"}>
+              <Descriptions.Item label="Room">
+                {modalData?.Name}
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Roomtype">
+                {modalData?.RoomType?.name}
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Building">
+                {modalData?.Building?.name}
+              </Descriptions.Item>
+
+              <Descriptions.Item label="Organization">
+                {modalData?.Org?.name}
+              </Descriptions.Item>
+
+              <Descriptions.Item label="จำนวนที่นั่งในห้อง">
+                {modalData?.Seat}
+              </Descriptions.Item>
+
+              <Descriptions.Item label="ขนาดห้อง">
+                {modalData?.Size}
+              </Descriptions.Item>
+
+              <Descriptions.Item label="อุปกรณ์ภายในห้อง">
+                {modalData?.Object.map((value, i) => (
+                  <React.Fragment key={i}>
+                    {value}
+                    <br/>
+                  </React.Fragment>
+                ))}
+              </Descriptions.Item>
+
+              <Descriptions.Item label="รายละเอียดเพิ่มเติม">
+                {modalData?.Detail}
+              </Descriptions.Item>
+            </Descriptions>
           </Modal>
         </div>
       </div>
