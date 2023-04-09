@@ -26,11 +26,18 @@ function Profile() {
         setstatuslist(response.data);
       });
   }
+  const [orgList, setOrgList] = useState([]);
+  function getOrg() {
+    axios.get("/org").then((response) => {
+      console.log(response);
+      setOrgList(response.data);
+    });
+  }
   useEffect(() => {
     getManageReq();
     getStatus()
+    getOrg()
   }, []);
-  const [user, setUser] = useState({});
   const Logout = () => {
     localStorage.removeItem("userData");
     document.location.reload(true);
@@ -74,26 +81,26 @@ function Profile() {
                 />
               </Form.Item>
               <Form.Item label="Name">
-                <Input placeholder="Name" value={dataSource?.firstname} />
+                <Input placeholder="Name" value={userData?.firstname} />
               </Form.Item>
               <Form.Item label="Lastname">
-                <Input placeholder="Name" value={dataSource?.lastname} />
+                <Input placeholder="Name" value={userData?.lastname} />
               </Form.Item>
               <Form.Item label="E-mail">
-                <Input placeholder="Name" value={dataSource?.email} />
+                <Input placeholder="Name" value={userData?.email} />
               </Form.Item>
               <Form.Item label="Password">
                 <Input.Password
                   placeholder="Password"
-                  value={dataSource?.password}
+                  value={userData?.password}
                 />
               </Form.Item>
-              <Form.Item label="Status" value={dataSource?.status}>
+              <Form.Item label="Status" value={userData?.status}>
               <Select
                 showSearch
                 placeholder="Status"
                 optionFilterProp="children"
-                value={dataSource?.status?.name}
+                value={userData?.status?.name}
                 filterOption={(input, option) =>
                   (option?.name ?? "")
                     .toLowerCase()
@@ -103,6 +110,25 @@ function Profile() {
                 options={statuslist}
               />
             </Form.Item>
+            <Form.Item
+                    label="หน่วยงาน"
+                    value={userData?.org}
+                  >
+                    <Select
+                      showSearch
+                      placeholder="หน่วยงาน"
+                      optionFilterProp="children"
+                      // onChange={onChangeorg}
+                      filterOption={(input, option) =>
+                        (option?.name ?? "")
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      fieldNames={{ label: "name", value: "_id" }}
+                      options={orgList}
+                      value={userData?.org?.name}
+                    />
+                  </Form.Item>
             </Form>
           </Col>
         </Row>
