@@ -3,6 +3,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin!
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
+import listPlugin from "@fullcalendar/list";
 
 import { Row, Col, Modal,Select } from "antd";
 
@@ -58,7 +59,7 @@ const handleCancel = () => {
           <h4>1</h4>
           จองเดือนนี้
         </button>
-        
+
         </div>
       </Row>
       <Row>
@@ -138,19 +139,35 @@ const handleCancel = () => {
                   <h2>ตารางการใช้งานห้อง</h2>
                 </label>
                 <FullCalendar
-                  plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                  plugins={[
+                    dayGridPlugin,
+                    timeGridPlugin,
+                    interactionPlugin,
+                    listPlugin,
+                  ]}
                   headerToolbar={{
-                    left: "prev,next today",
+                    left: "prevYear,nextYear prev,next today",
                     center: "title",
-                    right: "dayGridMonth",
+                    right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
                   }}
-                  selectable={true}
-                  select={handleSelect}
                 />
                 <Modal title="รายละเอียดการจอง" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-                       
+
                     </Modal>
               </div>
+            </Col>
+            <Col span={5} offset={1}>
+              <h2>รายละเอียดการจอง</h2>
+              <FullCalendar
+                plugins={[listPlugin]}
+                initialView="listMonth"
+                headerToolbar={{
+                  left: "",
+                  center: "",
+                  right: "",
+                }}
+                height={"80%"}
+              />
             </Col>
           </Row>
         </Col>

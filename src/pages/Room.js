@@ -211,6 +211,10 @@ function Room() {
               <Descriptions.Item label="รายละเอียดเพิ่มเติม">
                 {modalData?.Detail}
               </Descriptions.Item>
+
+              <Descriptions.Item label="ผู้ดูแล">
+                {modalData?.Contributor?.name}
+              </Descriptions.Item>
             </Descriptions>
           </Modal>
         </div>

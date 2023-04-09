@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Tabs, Col, Row, List, Typography, Table, Modal } from "antd";
-import {
-  AppstoreOutlined,
-  MailOutlined,
-  SettingOutlined,
-  DeleteOutlined,
-  EditOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined} from "@ant-design/icons";
 import axios from "axios";
 import dayjs from "dayjs";
 
@@ -26,24 +20,6 @@ const dataSource = [
     name: "John",
     age: 42,
     address: "10 Downing Street",
-  },
-];
-
-const columns = [
-  {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "Age",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "Address",
-    dataIndex: "address",
-    key: "address",
   },
 ];
 
@@ -99,7 +75,7 @@ function History() {
       },
     },
   ];
-  const [isEditing, setIsEditing] = useState(false);
+
   const [editingStudent, setEditingStudent] = useState(null);
   const onDeleteStudent = (record) => {
     Modal.confirm({
@@ -113,11 +89,6 @@ function History() {
       },
     });
   };
-  const onEditStudent = (record) => {
-    setIsEditing(true);
-    setEditingStudent({ ...record });
-  };
-  const [data, setData] = useState({});
 
   let toto = localStorage.getItem("userData");
   let userProfle = JSON.parse(toto);
@@ -149,8 +120,64 @@ function History() {
         );
       });
   }
+  const [historyAppored, sethistoryAppored] = useState([]);
+  function gethistoryAppored() {
+    axios
+      .get("requests/searchby?Status_Approve=Appored&&UserID=" + userProfle._id)
+      .then((response) => {
+        console.log(response);
+        sethistoryAppored(
+          response.data.map((item) => {
+            let timerev =
+              dayjs(item.startTime[0]).format("HH:mm") +
+              " - " +
+              dayjs(item.endTime[0]).format("HH:mm");
+            if (item.allDay == true) {
+              timerev = "Allday";
+            }
+            return {
+              ...item,
+              startTime: dayjs(item.startTime[0]).format("DD/MM/YYYY"),
+              endTime: dayjs(item.endTime[item.endTime.length - 1]).format(
+                "DD/MM/YYYY"
+              ),
+              timereservation: timerev,
+            };
+          })
+        );
+      });
+  }
+  const [historyRejectOrCancel, sethistoryRejectOrCancel] = useState([]);
+  function gethistoryRejectOrCancel() {
+    axios
+      .get("requests/searchby?Status_Approve=Cancled||Status_Approved=Rejected&&UserID=" + userProfle._id)
+      .then((response) => {
+        console.log(response);
+        sethistoryRejectOrCancel(
+          response.data.map((item) => {
+            let timerev =
+              dayjs(item.startTime[0]).format("HH:mm") +
+              " - " +
+              dayjs(item.endTime[0]).format("HH:mm");
+            if (item.allDay == true) {
+              timerev = "Allday";
+            }
+            return {
+              ...item,
+              startTime: dayjs(item.startTime[0]).format("DD/MM/YYYY"),
+              endTime: dayjs(item.endTime[item.endTime.length - 1]).format(
+                "DD/MM/YYYY"
+              ),
+              timereservation: timerev,
+            };
+          })
+        );
+      });
+  }
   useEffect(() => {
     gethistoryPending();
+    gethistoryAppored();
+    gethistoryRejectOrCancel();
   }, []);
 
   const items = [
@@ -167,16 +194,16 @@ function History() {
     },
     {
       key: "2",
-      label: `เสร็จสิ้น`,
+      label: `คำขอที่ได้รับการอนุญาต`,
       children: (
-        <Table dataSource={dataSource} columns={columns} pagination={null} />
+        <Table dataSource={dataSource} columns={columnshistoryPending} pagination={null} />
       ),
     },
     {
       key: "3",
-      label: `ประวัติการจอง`,
+      label: `คำขอที่ได้รับการปฏิเสธ/ยกเลิก`,
       children: (
-        <Table dataSource={dataSource} columns={columns} pagination={null} />
+        <Table dataSource={dataSource} columns={columnshistoryPending} pagination={null} />
       ),
     },
   ];
@@ -186,15 +213,14 @@ function History() {
         <div className="Heard-Manageano">
           <h1>History</h1>
         </div>
-        <Row>
-          <Col span={14} offset={6}>
+        <Row justify="center">
             <Tabs
+            style={{alignItems:"center"}}
               defaultActiveKey="1"
               items={items}
               onChange={onChange}
               size="large"
             />
-          </Col>
         </Row>
       </div>
     </div>
