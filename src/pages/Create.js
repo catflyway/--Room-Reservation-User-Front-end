@@ -194,7 +194,7 @@ function Create() {
                     rules={[
                       {
                         required: true,
-                        message: "Please input your username!",
+                        message: "Please input your Organization!",
                       },
                     ]}
                   >
@@ -218,7 +218,7 @@ function Create() {
                     rules={[
                       {
                         required: true,
-                        message: "Please input your username!",
+                        message: "Please input your Building!",
                       },
                     ]}
                   >
@@ -242,7 +242,7 @@ function Create() {
                     rules={[
                       {
                         required: true,
-                        message: "Please input your username!",
+                        message: "Please input your Room!",
                       },
                     ]}
                   >
@@ -275,7 +275,7 @@ function Create() {
                           rules={[
                             {
                               required: true,
-                              message: "Please input your username!",
+                              message: "Please input your reservation timing!",
                             },
                           ]}
                         >
@@ -296,7 +296,7 @@ function Create() {
                         rules={[
                           {
                             required: true,
-                            message: "Please input your username!",
+                            message: "Please input your StartDate!",
                           },
                         ]}
                       >
@@ -327,7 +327,7 @@ function Create() {
                           rules={[
                             {
                               required: true,
-                              message: "Please input your username!",
+                              message: "Please input your EndDate!",
                             },
                           ]}
                         >
@@ -354,7 +354,7 @@ function Create() {
                             rules={[
                               {
                                 required: true,
-                                message: "Please input your username!",
+                                message: "Please input your EndDate!",
                               },
                             ]}
                           >

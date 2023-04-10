@@ -67,7 +67,7 @@ function History() {
         return (
             <DeleteOutlined
               onClick={() => {
-                onDeleteStudent(record);
+                onDelete(record);
               }}
               style={{ color: "red", marginLeft: 12 }}
             />
@@ -76,16 +76,16 @@ function History() {
     },
   ];
 
-  const [editingStudent, setEditingStudent] = useState(null);
-  const onDeleteStudent = (record) => {
+  // const [editingStudent, setEditingStudent] = useState(null);
+  const onDelete = (record) => {
     Modal.confirm({
       title: "Are you sure, you want to delete this organization record?",
       okText: "Yes",
       okType: "danger",
       onOk: () => {
-        setEditingStudent((pre) => {
-          return pre.filter((student) => student.id !== record.id);
-        });
+        // setEditingStudent((pre) => {
+        //   return pre.filter((student) => student.id !== record.id);
+        // });
       },
     });
   };
@@ -196,14 +196,14 @@ function History() {
       key: "2",
       label: `คำขอที่ได้รับการอนุญาต`,
       children: (
-        <Table dataSource={dataSource} columns={columnshistoryPending} pagination={null} />
+        <Table dataSource={historyAppored} columns={columnshistoryPending} pagination={null} />
       ),
     },
     {
       key: "3",
       label: `คำขอที่ได้รับการปฏิเสธ/ยกเลิก`,
       children: (
-        <Table dataSource={dataSource} columns={columnshistoryPending} pagination={null} />
+        <Table dataSource={historyRejectOrCancel} columns={columnshistoryPending} pagination={null} />
       ),
     },
   ];

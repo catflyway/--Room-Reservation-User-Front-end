@@ -9,9 +9,6 @@ import { Row, Col, Modal,Select } from "antd";
 
 function Home() {
     const { Option } = Select;
-  const handleChange = (value) => {
-    console.log(`selected ${value}`);
-  };
   const [isModalVisible, setIsModalVisible] = useState(false);
     const [values, setValues] = useState({
       title: '',
