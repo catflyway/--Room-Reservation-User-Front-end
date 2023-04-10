@@ -3,16 +3,15 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./conponents/Navbar";
 import "./App.css";
 import axios from "axios";
+import { Layout, ConfigProvider } from "antd";
 
-import Home from "./pages/Home";
-import Room from "./pages/Room";
-import Create from "./pages/Create";
-import History from "./pages/History/History";
-import Profile from "./pages/Profile";
+import { MenuItems } from "./conponents/MenuItems";
+
 import LoginForm from "./conponents/LoginForm";
 import RegisterForm from "./conponents/RegisterForm";
 
-import { UserContext } from "./user-context";
+import { UserContext} from "./user-context";
+const { Header, Content, Footer } = Layout;
 
 const allowRole = ["User", "Room Contributor"];
 
@@ -65,17 +64,69 @@ function App() {
   };
   return (
     <UserContext.Provider value={userlogin}>
+       <ConfigProvider
+        theme={{
+          components: {
+            Button: {
+              colorPrimary: "#3F478D",
+              colorPrimaryActive: "#29306e",
+              colorPrimaryBorder: "#8e96e0",
+              colorPrimaryHover: "#5d65b0",
+            },
+          },
+        }}
+      >
       {userlogin.email !== "" ? (
         <BrowserRouter>
+         <Layout className="layout">
+              <Header>
           <Navbar />
+          </Header>
+          <Content
+                style={{
+                  padding: "0 50px",
+                }}
+              >
+                <div
+                  className="site-layout-content"
+                  style={{ background: "#FFF" }}
+                >
           <Routes>
-            <Route path="/" element={<Home />} />
+          {MenuItems.map((item, index) => {
+                      if (!item.role.includes(userlogin.role)) {
+                        return undefined;
+                      }
+                      return (
+                        <Route
+                          key={index}
+                          path={item.path}
+                          element={item.element}
+                        />
+                      );
+                    })}
+                    <Route
+                      path="*"
+                      element={
+                        // <Navigate to={UserDefaultPage[userlogin.role]} replace />
+                        <Navigate to="/" replace />
+                      }
+                    />
+            {/* <Route path="/" element={<Home />} />
             <Route path="/Rooms" element={<Room />} />
             <Route path="/Create" element={<Create />} />
             <Route path="/History" element={<History />} />
             <Route path="/Profiles" element={<Profile />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} /> */}
           </Routes>
+          </div>
+          </Content>
+
+              <Footer
+                style={{
+                  textAlign: "center",
+                }}
+              ></Footer>
+            </Layout>
         </BrowserRouter>
       ) : (
         <BrowserRouter>
@@ -86,6 +137,7 @@ function App() {
           </Routes>
         </BrowserRouter>
       )}
+      </ConfigProvider>
     </UserContext.Provider>
   );
 }
