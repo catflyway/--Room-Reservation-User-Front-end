@@ -347,7 +347,7 @@ function RegisterForm() {
           </Row>
         </div>
       ) : (
-        <RegisterForm />
+        <LoginForm />
       )}
     </>
   );

@@ -3,7 +3,6 @@ import profile from "./image/a.jpg";
 import { FiMail } from "react-icons/fi";
 import { FiLock } from "react-icons/fi";
 import { Button } from "antd";
-import RegisterForm from "./RegisterForm";
 
 function LoginForm({ Loginuser, error }) {
   const [detailslogin, setDetailslogin] = useState({
@@ -15,10 +14,6 @@ function LoginForm({ Loginuser, error }) {
     e.preventDefault();
 
     Loginuser(detailslogin);
-  };
-  const OnButtonClick = () => {
-    <RegisterForm />;
-    console.log("Button clicked");
   };
   return (
     <div className="main">
