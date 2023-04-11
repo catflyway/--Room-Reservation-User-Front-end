@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Tabs, Col, Row, List, Typography, Table, Modal } from "antd";
-import { DeleteOutlined} from "@ant-design/icons";
+import { DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 import dayjs from "dayjs";
 
@@ -47,13 +47,13 @@ function History() {
     },
     {
       title: "Building",
-      dataIndex: "Building",
-      key: "Building",
+      dataIndex: "buildingname",
+      key: "buildingname",
     },
     {
       title: "Room",
-      dataIndex: "Room",
-      key: "Room",
+      dataIndex: "roomname",
+      key: "roomname",
     },
     {
       title: "Purpose",
@@ -65,27 +65,25 @@ function History() {
       title: "Actions",
       render: (record) => {
         return (
-            <DeleteOutlined
-              onClick={() => {
-                onDelete(record);
-              }}
-              style={{ color: "red", marginLeft: 12 }}
-            />
+          <DeleteOutlined
+            onClick={() => {
+              onDelete(record);
+            }}
+            style={{ color: "red", marginLeft: 12 }}
+          />
         );
       },
     },
   ];
 
   // const [editingStudent, setEditingStudent] = useState(null);
-  const onDelete = (record) => {
+  const onDelete = () => {
     Modal.confirm({
       title: "Are you sure, you want to delete this organization record?",
       okText: "Yes",
       okType: "danger",
       onOk: () => {
-        // setEditingStudent((pre) => {
-        //   return pre.filter((student) => student.id !== record.id);
-        // });
+        return "Cancled";
       },
     });
   };
@@ -96,7 +94,7 @@ function History() {
   const [historyPending, sethistoryPending] = useState([]);
   function gethistoryPending() {
     axios
-      .get("requests/searchby?Status_Approve=Pending&&UserID=" + userProfle._id)
+      .get("requests/searchby?Status_Approve=Pending&&User=" + userProfle._id)
       .then((response) => {
         console.log(response);
         sethistoryPending(
@@ -115,6 +113,8 @@ function History() {
                 "DD/MM/YYYY"
               ),
               timereservation: timerev,
+              buildingname: item.Building.name,
+              roomname: item.Room.name,
             };
           })
         );
@@ -123,7 +123,7 @@ function History() {
   const [historyAppored, sethistoryAppored] = useState([]);
   function gethistoryAppored() {
     axios
-      .get("requests/searchby?Status_Approve=Appored&&UserID=" + userProfle._id)
+      .get("requests/searchby?Status_Approve=Appored&&User=" + userProfle._id)
       .then((response) => {
         console.log(response);
         sethistoryAppored(
@@ -141,7 +141,8 @@ function History() {
               endTime: dayjs(item.endTime[item.endTime.length - 1]).format(
                 "DD/MM/YYYY"
               ),
-              timereservation: timerev,
+              buildingname: item.Building.name,
+              roomname: item.Room.name,
             };
           })
         );
@@ -150,7 +151,10 @@ function History() {
   const [historyRejectOrCancel, sethistoryRejectOrCancel] = useState([]);
   function gethistoryRejectOrCancel() {
     axios
-      .get("requests/searchby?Status_Approve=Cancled||Status_Approved=Rejected&&UserID=" + userProfle._id)
+      .get(
+        "requests/searchby?Status_Approve=Cancled||Status_Approved=Rejected&&User=" +
+          userProfle._id
+      )
       .then((response) => {
         console.log(response);
         sethistoryRejectOrCancel(
@@ -168,7 +172,8 @@ function History() {
               endTime: dayjs(item.endTime[item.endTime.length - 1]).format(
                 "DD/MM/YYYY"
               ),
-              timereservation: timerev,
+              buildingname: item.Building.name,
+              roomname: item.Room.name,
             };
           })
         );
@@ -196,14 +201,22 @@ function History() {
       key: "2",
       label: `คำขอที่ได้รับการอนุญาต`,
       children: (
-        <Table dataSource={historyAppored} columns={columnshistoryPending} pagination={null} />
+        <Table
+          dataSource={historyAppored}
+          columns={columnshistoryPending}
+          pagination={null}
+        />
       ),
     },
     {
       key: "3",
       label: `คำขอที่ได้รับการปฏิเสธ/ยกเลิก`,
       children: (
-        <Table dataSource={historyRejectOrCancel} columns={columnshistoryPending} pagination={null} />
+        <Table
+          dataSource={historyRejectOrCancel}
+          columns={columnshistoryPending}
+          pagination={null}
+        />
       ),
     },
   ];
@@ -214,13 +227,13 @@ function History() {
           <h1>History</h1>
         </div>
         <Row justify="center">
-            <Tabs
-            style={{alignItems:"center"}}
-              defaultActiveKey="1"
-              items={items}
-              onChange={onChange}
-              size="large"
-            />
+          <Tabs
+            style={{ alignItems: "center" }}
+            defaultActiveKey="1"
+            items={items}
+            onChange={onChange}
+            size="large"
+          />
         </Row>
       </div>
     </div>

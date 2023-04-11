@@ -47,7 +47,7 @@ function RegisterForm() {
         console.log(response);
         setstatus(response.data);
 
-        //   form.resetFields(["status"])
+        form.resetFields(["status"]);
       })
       .catch((err) => {
         setUserStatusLoading(false);
@@ -83,19 +83,6 @@ function RegisterForm() {
     }
     return e?.fileList;
   };
-  const onAddUser = (e) => {
-    form.submit();
-  };
-  const onCancelAdd = () => {
-    setIsModalOpen(false);
-  };
-
-  const showModal = () => {
-    form.resetFields();
-    setImageUrl(undefined);
-    setLoading(false);
-    setIsModalOpen(true);
-  };
 
   const onChangeorg = (orgID) => {
     console.log(`selected ${orgID}`);
@@ -111,10 +98,6 @@ function RegisterForm() {
   }, []);
 
   const [Clickcreate, setClickcreate] = useState(true);
-  const Clicknext = (e) => {
-    setClickcreate(true);
-    console.log("5555");
-  };
   const onFormFinish = (formValue) => {
     // formValue = {
     //   ...formValue,
@@ -324,13 +307,6 @@ function RegisterForm() {
                 >
                   <Select placeholder="Select a Role">
                     <Select.Option value="User">User</Select.Option>
-                    {/* <Select.Option value="Room Contributor">
-                  Room Contributor
-                </Select.Option>
-                <Select.Option value="Contributor">Contributor</Select.Option>
-                <Select.Option value="Administrator">
-                  Administrator
-                </Select.Option> */}
                   </Select>
                 </Form.Item>
                 <Row justify="center">
