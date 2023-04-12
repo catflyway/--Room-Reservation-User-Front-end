@@ -77,11 +77,11 @@ function Create() {
   const [Clickcreate, setClickcreate] = useState(true);
   const handleSubmit = (value) => {
     console.log(value);
-    axios.post("/Requests", data).then((response) => {
-      console.log(response.data);
-    });
-    console.log(data);
-    setClickcreate(false);
+    // axios.post("/Requests", data).then((response) => {
+    //   console.log(response.data);
+    // });
+    // console.log(data);
+    // setClickcreate(false);
   };
   const Clicknext = (e) => {
     setClickcreate(true);
@@ -90,6 +90,7 @@ function Create() {
 
   const datOfWeekString = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 
+  const [form] = Form.useForm();
   const [isAllDay, setIsAllDay] = useState(true);
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
@@ -179,6 +180,7 @@ function Create() {
             <Row>
               <Col span={12} offset={6}>
                 <Form
+                  form={form}
                   labelCol={{
                     span: 6,
                   }}

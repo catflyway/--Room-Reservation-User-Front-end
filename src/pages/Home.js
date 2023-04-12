@@ -6,7 +6,7 @@ import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClic
 import listPlugin from "@fullcalendar/list";
 import axios from "axios";
 
-import { Row, Col, Modal, Select, Typography, Form } from "antd";
+import { Row, Col, Modal, Select, Typography, Form, Space } from "antd";
 
 function Home() {
   const { Title } = Typography;
@@ -116,93 +116,6 @@ function Home() {
   }, []);
   return (
     <div className="App">
-      {/* <div>
-      <Row justify="center">
-        <div className="Heard-ManageCa">
-        <h2>Dashboard</h2>
-        </div>
-        <div className="col-1">
-        <button className="col-1-1">
-          <h4>1</h4>
-          จองวันนี้
-        </button>
-        <button className="col-1-1">
-          <h4>1</h4>
-          จองเดือนนี้
-        </button>
-
-        </div>
-      </Row>
-      <Row>
-        <Col span={24}>
-        <div className="searchgraphdate">
-        <div className='searches'>
-        Organization : {" "}
-          <Select
-            showSearch
-            style={{
-              width: 200,
-            }}
-            placeholder="Search to Select"
-            optionFilterProp="children"
-            filterOption={(input, option) => option.children.includes(input)}
-            filterSort={(optionA, optionB) =>
-              optionA.children
-                .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
-            }
-          >
-            <Option value="1">โรงพยาบาลA</Option>
-            <Option value="2">โรงเรียนA</Option>
-            <Option value="3">โรงเรียนB</Option>
-            <Option value="4">ตึกB</Option>
-          </Select>
-          </div>
-          <div className='searches'>
-          Building : {" "}
-          <Select
-            showSearch
-            style={{
-              width: 200,
-            }}
-            placeholder="Search to Select"
-            optionFilterProp="children"
-            filterOption={(input, option) => option.children.includes(input)}
-            filterSort={(optionA, optionB) =>
-              optionA.children
-                .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
-            }
-          >
-            <Option value="1">โรงพยาบาลA</Option>
-            <Option value="2">โรงเรียนA</Option>
-            <Option value="3">โรงเรียนB</Option>
-            <Option value="4">ตึกB</Option>
-          </Select>
-          </div>
-          <div className='searches'>
-          Room : {" "}
-          <Select
-            showSearch
-            style={{
-              width: 200,
-            }}
-            placeholder="Search to Select"
-            optionFilterProp="children"
-            filterOption={(input, option) => option.children.includes(input)}
-            filterSort={(optionA, optionB) =>
-              optionA.children
-                .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
-            }
-          >
-            <Option value="1">โรงพยาบาลA</Option>
-            <Option value="2">โรงเรียนA</Option>
-            <Option value="3">โรงเรียนB</Option>
-            <Option value="4">ตึกB</Option>
-          </Select>
-          </div>
-        </div> */}
       <Row justify="center">
         <Col span={24}>
           <Row justify="center">
@@ -253,83 +166,85 @@ function Home() {
                 span: 19,
               }}
             >
-              <Form.Item
-                name="name"
-                // rules={[{ required: true }]}
-                label="Organization: "
-              >
-                <Col>
-                  <Select
-                    style={{
-                      width: "200px",
-                    }}
-                    showSearch
-                    placeholder="หน่วยงาน"
-                    optionFilterProp="children"
-                    onChange={onChangeorg}
-                    filterOption={(input, option) =>
-                      (option?.name ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    fieldNames={{ label: "name", value: "_id" }}
-                    options={orgList}
-                    loadin={OrgLoading}
-                  />
-                </Col>
-              </Form.Item>
+              <Space wrap>
+                <Form.Item
+                  name="name"
+                  // rules={[{ required: true }]}
+                  label="Organization: "
+                >
+                  <Col>
+                    <Select
+                      style={{
+                        width: "200px",
+                      }}
+                      showSearch
+                      placeholder="หน่วยงาน"
+                      optionFilterProp="children"
+                      onChange={onChangeorg}
+                      filterOption={(input, option) =>
+                        (option?.name ?? "")
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      fieldNames={{ label: "name", value: "_id" }}
+                      options={orgList}
+                      loadin={OrgLoading}
+                    />
+                  </Col>
+                </Form.Item>
 
-              <Form.Item
-                name="buildingname"
-                // rules={[{ required: true }]}
-                label=" Building: "
-              >
-                <Col>
-                  <Select
-                    style={{
-                      width: "200px",
-                    }}
-                    showSearch
-                    placeholder="อาคาร/สถานที่"
-                    optionFilterProp="children"
-                    onChange={onChangebuild}
-                    filterOption={(input, option) =>
-                      (option?.name ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    fieldNames={{ label: "name", value: "_id" }}
-                    options={buildingList}
-                    loadin={BuildLoading}
-                  />
-                </Col>
-              </Form.Item>
+                <Form.Item
+                  name="buildingname"
+                  // rules={[{ required: true }]}
+                  label=" Building: "
+                >
+                  <Col>
+                    <Select
+                      style={{
+                        width: "200px",
+                      }}
+                      showSearch
+                      placeholder="อาคาร/สถานที่"
+                      optionFilterProp="children"
+                      onChange={onChangebuild}
+                      filterOption={(input, option) =>
+                        (option?.name ?? "")
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      fieldNames={{ label: "name", value: "_id" }}
+                      options={buildingList}
+                      loadin={BuildLoading}
+                    />
+                  </Col>
+                </Form.Item>
 
-              <Form.Item
-                name="Name"
-                // rules={[{ required: true }]}
-                label=" Room: "
-              >
-                <Col>
-                  <Select
-                    style={{
-                      width: "200px",
-                    }}
-                    showSearch
-                    placeholder="ห้อง"
-                    optionFilterProp="children"
-                    // onChange={value => onChange({ ...details, Room: value })}
-                    filterOption={(input, option) =>
-                      (option?.Name ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    fieldNames={{ label: "Name", value: "_id" }}
-                    options={roomsList}
-                    loading={RoomLoading}
-                  />
-                </Col>
-              </Form.Item>
+                <Form.Item
+                  name="Name"
+                  // rules={[{ required: true }]}
+                  label=" Room: "
+                >
+                  <Col>
+                    <Select
+                      style={{
+                        width: "200px",
+                      }}
+                      showSearch
+                      placeholder="ห้อง"
+                      optionFilterProp="children"
+                      // onChange={value => onChange({ ...details, Room: value })}
+                      filterOption={(input, option) =>
+                        (option?.Name ?? "")
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      fieldNames={{ label: "Name", value: "_id" }}
+                      options={roomsList}
+                      loading={RoomLoading}
+                    />
+                  </Col>
+                </Form.Item>
+              </Space>
             </Form>
           </Row>
 

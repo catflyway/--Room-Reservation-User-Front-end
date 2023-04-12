@@ -8,21 +8,6 @@ const onChange = (key) => {
   console.log(key);
 };
 
-const dataSource = [
-  {
-    key: "1",
-    name: "Mike",
-    age: 32,
-    address: "10 Downing Street",
-  },
-  {
-    key: "2",
-    name: "John",
-    age: 42,
-    address: "10 Downing Street",
-  },
-];
-
 function History() {
   const columnshistoryPending = [
     {
@@ -76,7 +61,6 @@ function History() {
     },
   ];
 
-  // const [editingStudent, setEditingStudent] = useState(null);
   const onDelete = () => {
     Modal.confirm({
       title: "Are you sure, you want to delete this organization record?",
@@ -94,7 +78,7 @@ function History() {
   const [historyPending, sethistoryPending] = useState([]);
   function gethistoryPending() {
     axios
-      .get("requests/searchby?Status_Approve=Pending&&User=" + userProfle._id)
+      .get("requests/searchby?Status_Approve=Pending&UserID=" + userProfle._id)
       .then((response) => {
         console.log(response);
         sethistoryPending(
@@ -123,7 +107,7 @@ function History() {
   const [historyAppored, sethistoryAppored] = useState([]);
   function gethistoryAppored() {
     axios
-      .get("requests/searchby?Status_Approve=Appored&&User=" + userProfle._id)
+      .get("requests/searchby?Status_Approve=Approved&UserID=" + userProfle._id)
       .then((response) => {
         console.log(response);
         sethistoryAppored(
@@ -141,6 +125,7 @@ function History() {
               endTime: dayjs(item.endTime[item.endTime.length - 1]).format(
                 "DD/MM/YYYY"
               ),
+              timereservation: timerev,
               buildingname: item.Building.name,
               roomname: item.Room.name,
             };
@@ -152,7 +137,7 @@ function History() {
   function gethistoryRejectOrCancel() {
     axios
       .get(
-        "requests/searchby?Status_Approve=Cancled||Status_Approved=Rejected&&User=" +
+        "requests/searchby?Status_Approve=Cancled&Status_Approve=Rejected&UserID=" +
           userProfle._id
       )
       .then((response) => {
@@ -172,6 +157,7 @@ function History() {
               endTime: dayjs(item.endTime[item.endTime.length - 1]).format(
                 "DD/MM/YYYY"
               ),
+              timereservation: timerev,
               buildingname: item.Building.name,
               roomname: item.Room.name,
             };

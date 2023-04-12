@@ -207,23 +207,19 @@ table{
   margin-left: auto;
   margin-right: auto;
 }
-/* th{
-  padding: 15px;
-  font-weight: bold;
-  color: #8789D6;
-  text-align: center;
-  margin-right: 2rem;
-}
-td{
-  padding: 15px;
-  color: #3F478D;
-  text-align: center;
-  border-bottom: 2px solid #ddd;
-}
-tr:hover{
-  background-color: rgb(196, 216, 241);
-} */
 
+.button-reset{
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-right: 20px;
+  margin-left: 10px;
+  width: 150px;
+  height: 40px;
+  border-radius: 10px;
+  color: #3F478D;
+  font-size: 18px;
+  border: none;
+}
 .button-back{
   width: 120px;
   height: 35px;
@@ -393,26 +389,17 @@ tr:hover{
 }
 .button-login{
   margin-top: 20px;
- /* margin-bottom: 20px;*/
   margin-right: 20px;
   width: 150px;
-  /* height: 40px; */
   border-radius: 10px;
   color: #fff;
   background-color: #07D064;
-  /* font-size: 18px;
-  border: none; */
 }
 .button-reg{
-  /* margin-top: 20px;
-  margin-bottom: 20px; */
   width: 150px;
-  /* height: 40px; */
   border-radius: 10px;
   color: #fff;
   background-color: #3F478D;
-  /* font-size: 18px;
-  border: none; */
 }
 .imgprofile{
   display: block;
@@ -422,7 +409,6 @@ tr:hover{
   margin-bottom: 20px;
 }
 .imgprofilebor{
-  /* border-radius: 30%; */
   border-radius: 8px;
 }
 .form-upload-picture {
