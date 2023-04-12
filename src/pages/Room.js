@@ -11,13 +11,68 @@ import {
   Col,
   Descriptions,
   Card,
+  Space,
+  Input,
 } from "antd";
 import axios from "axios";
-import { UserContext } from "../user-context";
 
 function Room() {
-  const user = useContext(UserContext);
-  const { Option } = Select;
+  const { Search } = Input;
+
+  const [form] = Form.useForm();
+  const [orgList, setOrgList] = useState([]);
+  function getOrg() {
+    axios.get("/org").then((response) => {
+      console.log(response);
+      setOrgList(response.data);
+    });
+  }
+  const [buildingList, setBuildingList] = useState([]);
+  function getBuildingInOrgID(id) {
+    axios.get("/org/building/" + id).then((response) => {
+      console.log(response);
+      setBuildingList(response.data);
+    });
+  }
+  const [RoomtypeList, setRoomtypeList] = useState([]);
+  function getRoomtype(id) {
+    axios.get("/org/roomtype/" + id, { crossdomain: true }).then((response) => {
+      console.log(response);
+      setRoomtypeList(response.data);
+    });
+  }
+
+  const [SearchroomsList, setSearchRoomsList] = useState([]);
+  function getSearchRoom(id) {
+    axios.get("/rooms/search/" + id, { crossdomain: true }).then((response) => {
+      console.log(response);
+      setSearchRoomsList(response.data);
+    });
+  }
+  function getManageRooms(option) {
+    let query = [];
+    for (const [key, value] of Object.entries(option || {})) {
+      if (value) {
+        query.push(`${key}=${value}`);
+      }
+    }
+    query = query.join("&");
+
+    axios
+      .get("/rooms/searchby?" + query, { crossdomain: true })
+      .then((response) => {
+        console.log(response);
+        setDataSource(
+          response.data.map((item) => {
+            return {
+              ...item,
+              BuildingName: item.Building.name,
+              RoomTypeName: item.RoomType.name,
+            };
+          })
+        );
+      });
+  }
   const [dataSource, setDataSource] = useState([]);
   function getRoom() {
     axios
@@ -29,8 +84,20 @@ function Room() {
         setDataSource(response.data);
       });
   }
+  const onChangeorg = (orgID) => {
+    console.log(`selected ${orgID}`);
+    getBuildingInOrgID(orgID);
+    getRoomtype(orgID);
+  };
+  const onChangebuild = (buildingID) => {
+    console.log(`selected ${buildingID}`);
+  };
+  const onChangeroomtype = (roomtypeID) => {
+    console.log(`selected ${roomtypeID}`);
+  };
   useEffect(() => {
     getRoom();
+    getOrg();
   }, []);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,6 +109,14 @@ function Room() {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+  const [selectedItems, setSelectedItems] = useState([]);
+  const filteredOptions = SearchroomsList.filter(
+    (o) => !selectedItems.includes(o)
+  );
+  const onFilterChange = (changedValues, allValues) => {
+    console.log(changedValues, allValues);
+    getManageRooms(allValues);
+  };
 
   return (
     <div className="App">
@@ -49,74 +124,88 @@ function Room() {
         <div className="Heard-Manageano">
           <h1>Rooms</h1>
         </div>
-        <div className="searchgraph">
-          <div className="searches">
-            Organization :{" "}
-            <Select
-              showSearch
-              style={{
-                width: 200,
-              }}
-              placeholder="Search to Select"
-              optionFilterProp="children"
-              filterOption={(input, option) => option.children.includes(input)}
-              filterSort={(optionA, optionB) =>
-                optionA.children
-                  .toLowerCase()
-                  .localeCompare(optionB.children.toLowerCase())
-              }
-            >
-              <Option value="1">โรงพยาบาลA</Option>
-              <Option value="2">โรงเรียนA</Option>
-              <Option value="3">โรงเรียนB</Option>
-              <Option value="4">ตึกB</Option>
-            </Select>
-          </div>
-          <div className="searches">
-            Building :{" "}
-            <Select
-              showSearch
-              style={{
-                width: 200,
-              }}
-              placeholder="Search to Select"
-              optionFilterProp="children"
-              filterOption={(input, option) => option.children.includes(input)}
-              filterSort={(optionA, optionB) =>
-                optionA.children
-                  .toLowerCase()
-                  .localeCompare(optionB.children.toLowerCase())
-              }
-            >
-              <Option value="1">โรงพยาบาลA</Option>
-              <Option value="2">โรงเรียนA</Option>
-              <Option value="3">โรงเรียนB</Option>
-              <Option value="4">ตึกB</Option>
-            </Select>
-          </div>
-          <div className="searches">
-            Room :{" "}
-            <Select
-              showSearch
-              style={{
-                width: 200,
-              }}
-              placeholder="Search to Select"
-              optionFilterProp="children"
-              filterOption={(input, option) => option.children.includes(input)}
-              filterSort={(optionA, optionB) =>
-                optionA.children
-                  .toLowerCase()
-                  .localeCompare(optionB.children.toLowerCase())
-              }
-            >
-              <Option value="1">โรงพยาบาลA</Option>
-              <Option value="2">โรงเรียนA</Option>
-              <Option value="3">โรงเรียนB</Option>
-              <Option value="4">ตึกB</Option>
-            </Select>
-          </div>
-        </div>
+        <Row justify="center" gutter={[16, 16]}>
+          <Form form={form} onValuesChange={onFilterChange}>
+            <Space wrap>
+              <Form.Item label="Organization" name="OrgID">
+                <Select
+                  style={{
+                    width: "200px",
+                  }}
+                  allowClear
+                  showSearch
+                  placeholder="หน่วยงาน"
+                  optionFilterProp="children"
+                  onChange={onChangeorg}
+                  filterOption={(input, option) =>
+                    (option?.name ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  fieldNames={{ label: "name", value: "_id" }}
+                  options={orgList}
+                />
+              </Form.Item>
+
+              <Form.Item label="Building" name="BuildingID">
+                <Select
+                  style={{
+                    width: "200px",
+                  }}
+                  allowClear
+                  showSearch
+                  placeholder="อาคาร/สถานที่"
+                  optionFilterProp="children"
+                  onChange={onChangebuild}
+                  filterOption={(input, option) =>
+                    (option?.name ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  fieldNames={{ label: "name", value: "_id" }}
+                  options={buildingList}
+                />
+              </Form.Item>
+
+              <Form.Item label="Roomtype" name="RoomTypeID">
+                <Select
+                  style={{
+                    width: "200px",
+                  }}
+                  allowClear
+                  showSearch
+                  placeholder="ประเภทห้อง"
+                  optionFilterProp="children"
+                  onChange={onChangeroomtype}
+                  filterOption={(input, option) =>
+                    (option?.name ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  fieldNames={{ label: "name", value: "_id" }}
+                  options={RoomtypeList}
+                />
+              </Form.Item>
+
+              <Form.Item name="Name">
+                <Search
+                  placeholder="Search Room"
+                  allowClear
+                  value={selectedItems}
+                  onChange={setSelectedItems}
+                  options={filteredOptions.map((item) => ({
+                    value: item._id,
+                    label: item.Name,
+                  }))}
+                  style={{
+                    width: 200,
+                  }}
+                />
+              </Form.Item>
+            </Space>
+          </Form>
+        </Row>
+
         <div className="User-list-heard">
           <List
             dataSource={dataSource}
@@ -158,10 +247,7 @@ function Room() {
             onCancel={handleCancel}
           >
             <Row justify="center">
-              <Card
-                hoverable
-                bodyStyle={{padding: "0"}}
-              >
+              <Card hoverable bodyStyle={{ padding: "0" }}>
                 <Image
                   className="imgprofilebor"
                   preview={false}
@@ -203,7 +289,7 @@ function Room() {
                 {modalData?.Object.map((value, i) => (
                   <React.Fragment key={i}>
                     {value}
-                    <br/>
+                    <br />
                   </React.Fragment>
                 ))}
               </Descriptions.Item>
