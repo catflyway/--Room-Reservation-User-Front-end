@@ -77,11 +77,11 @@ function Create() {
   const [Clickcreate, setClickcreate] = useState(true);
   const handleSubmit = (value) => {
     console.log(value);
-    // axios.post("/Requests", data).then((response) => {
-    //   console.log(response.data);
-    // });
-    // console.log(data);
-    // setClickcreate(false);
+    axios.post("/Requests", data).then((response) => {
+      console.log(response.data);
+    });
+    console.log(data);
+    setClickcreate(false);
   };
   const Clicknext = (e) => {
     setClickcreate(true);
@@ -428,7 +428,7 @@ function Create() {
         ) : (
           <Result
             icon={<SmileOutlined />}
-            title="Great, we have done all the operations!"
+            title="Your reservation has been made! ^_^"
             extra={
               <Button type="primary" onClick={Clicknext}>
                 Next

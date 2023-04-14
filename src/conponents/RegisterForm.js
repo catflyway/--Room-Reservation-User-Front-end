@@ -99,24 +99,24 @@ function RegisterForm() {
 
   const [Clickcreate, setClickcreate] = useState(true);
   const onFormFinish = (formValue) => {
-    // formValue = {
-    //   ...formValue,
-    //   image: formValue.image[0].originFileObj,
-    // };
-    // axios
-    //   .postForm("/auth/register", formValue)
-    //   .then((response) => {
-    //     console.log("res", response);
-    //     setLoading(false);
-    //     setIsModalOpen(false);
-    //     message.success("สมัครสมาชิกสำเร็จ");
-    //     setClickcreate(false);
-    //   })
-    //   .catch((err) => {
-    //     console.log("err", err);
-    //     setLoading(false);
-    //     message.error("ERROR");
-    //   });
+    formValue = {
+      ...formValue,
+      image: formValue.image[0].originFileObj,
+    };
+    axios
+      .postForm("/auth/register", formValue)
+      .then((response) => {
+        console.log("res", response);
+        setLoading(false);
+        setIsModalOpen(false);
+        message.success("สมัครสมาชิกสำเร็จ");
+        setClickcreate(false);
+      })
+      .catch((err) => {
+        console.log("err", err);
+        setLoading(false);
+        message.error("ERROR");
+      });
     setClickcreate(false);
     console.log(formValue);
   };
