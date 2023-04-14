@@ -49,6 +49,7 @@ function Room() {
       setSearchRoomsList(response.data);
     });
   }
+  const [dataSource, setDataSource] = useState([]);
   function getManageRooms(option) {
     let query = [];
     for (const [key, value] of Object.entries(option || {})) {
@@ -73,17 +74,7 @@ function Room() {
         );
       });
   }
-  const [dataSource, setDataSource] = useState([]);
-  function getRoom() {
-    axios
-      .get("https://roomreserve1.herokuapp.com/rooms/room", {
-        crossdomain: true,
-      })
-      .then((response) => {
-        console.log(response);
-        setDataSource(response.data);
-      });
-  }
+
   const onChangeorg = (orgID) => {
     console.log(`selected ${orgID}`);
     getBuildingInOrgID(orgID);
@@ -96,7 +87,7 @@ function Room() {
     console.log(`selected ${roomtypeID}`);
   };
   useEffect(() => {
-    getRoom();
+    getManageRooms();
     getOrg();
   }, []);
 
