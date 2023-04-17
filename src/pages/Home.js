@@ -11,14 +11,8 @@ import { Row, Col, Modal, Select, Typography, Form, Space } from "antd";
 function Home() {
   const { Title } = Typography;
   const [form] = Form.useForm();
-  const { Option } = Select;
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [values, setValues] = useState({
-    title: "",
-    start: "",
-    end: "",
-    color: "",
-  });
+  const [events, setIsevents] = useState([]);
+
   const [OrgLoading, setOrgLoading] = useState(false);
   const [orgList, setOrgList] = useState([]);
   function getOrg() {
@@ -79,27 +73,50 @@ function Home() {
 
   const onChangeorg = (orgID) => {
     console.log(`selected ${orgID}`);
-    getBuildingInOrgID(orgID);
+    if (orgID) {
+      getBuildingInOrgID(orgID);
+    }
+    form.resetFields(["Building"]);
   };
 
   const onChangebuild = (buildingID) => {
     console.log(`selected ${buildingID}`);
-    getRoomsInOrgID(buildingID);
+    if (buildingID) {
+      getRoomsInOrgID(buildingID);
+    }
+    form.resetFields(["Room"]);
   };
 
-  const onChangeValues = (e) => {
-    console.log(e.target.value);
-    setValues({ ...values, [e.target.name]: e.target.value });
-  };
-  const handleSelect = (info) => {
-    showModal();
-    console.log(info);
-    setValues({
-      ...values,
-      start: info.startStr,
-      end: info.endStr,
+  function getManageCalendar(option) {
+    let query = [];
+    for (const [key, value] of Object.entries(option || {})) {
+      if (value) {
+        query.push(`${key}=${value}`);
+      }
+    }
+    query = query.join("&");
+    axios.get("/calendar/searchby?" + query).then((response) => {
+      console.log(response);
+      setIsevents(
+        response.data.map((item) => {
+          return {
+            title: item.Room.name + "   " + item.Purpose,
+            start: item.startTime,
+            end: item.endTime,
+            allDay: item.allDay,
+          };
+        })
+      );
     });
-  };
+  }
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [values, setValues] = useState({
+    title: "",
+    start: "",
+    end: "",
+    color: "",
+  });
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -111,8 +128,13 @@ function Home() {
     setValues({ ...values, title: "" });
     setIsModalVisible(false);
   };
+  const onFilterChange = (changedValues, allValues) => {
+    console.log(changedValues, allValues);
+    getManageCalendar(allValues);
+  };
   useEffect(() => {
     getOrg();
+    getManageCalendar();
   }, []);
   return (
     <div className="App">
@@ -159,6 +181,7 @@ function Home() {
           >
             <Form
               form={form}
+              onValuesChange={onFilterChange}
               labelCol={{
                 span: 7,
               }}
@@ -168,81 +191,78 @@ function Home() {
             >
               <Space wrap>
                 <Form.Item
-                  name="name"
+                  name="Org"
                   // rules={[{ required: true }]}
                   label="Organization: "
                 >
-                  <Col>
-                    <Select
-                      style={{
-                        width: "200px",
-                      }}
-                      showSearch
-                      placeholder="หน่วยงาน"
-                      optionFilterProp="children"
-                      onChange={onChangeorg}
-                      filterOption={(input, option) =>
-                        (option?.name ?? "")
-                          .toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                      fieldNames={{ label: "name", value: "_id" }}
-                      options={orgList}
-                      loadin={OrgLoading}
-                    />
-                  </Col>
+                  <Select
+                    style={{
+                      width: "200px",
+                    }}
+                    showSearch
+                    allowClear
+                    placeholder="หน่วยงาน"
+                    optionFilterProp="children"
+                    onChange={onChangeorg}
+                    filterOption={(input, option) =>
+                      (option?.name ?? "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    fieldNames={{ label: "name", value: "_id" }}
+                    options={orgList}
+                    loadin={OrgLoading}
+                  />
                 </Form.Item>
 
                 <Form.Item
-                  name="buildingname"
+                  name="Building"
                   // rules={[{ required: true }]}
                   label=" Building: "
                 >
-                  <Col>
-                    <Select
-                      style={{
-                        width: "200px",
-                      }}
-                      showSearch
-                      placeholder="อาคาร/สถานที่"
-                      optionFilterProp="children"
-                      onChange={onChangebuild}
-                      filterOption={(input, option) =>
-                        (option?.name ?? "")
-                          .toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                      fieldNames={{ label: "name", value: "_id" }}
-                      options={buildingList}
-                      loadin={BuildLoading}
-                    />
-                  </Col>
+                  <Select
+                    style={{
+                      width: "200px",
+                    }}
+                    showSearch
+                    allowClear
+                    placeholder="อาคาร/สถานที่"
+                    optionFilterProp="children"
+                    onChange={onChangebuild}
+                    filterOption={(input, option) =>
+                      (option?.name ?? "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    fieldNames={{ label: "name", value: "_id" }}
+                    options={buildingList}
+                    loadin={BuildLoading}
+                  />
                 </Form.Item>
 
                 <Form.Item
-                  name="Name"
+                  name="Room"
                   // rules={[{ required: true }]}
                   label=" Room: "
                 >
-                  <Col>
-                    <Select
-                      style={{
-                        width: "200px",
-                      }}
-                      showSearch
-                      placeholder="ห้อง"
-                      optionFilterProp="children"
-                      // onChange={value => onChange({ ...details, Room: value })}
-                      filterOption={(input, option) =>
-                        (option?.Name ?? "")
-                          .toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                      fieldNames={{ label: "Name", value: "_id" }}
-                      options={roomsList}
-                      loading={RoomLoading}
-                    />
-                  </Col>
+                  <Select
+                    style={{
+                      width: "200px",
+                    }}
+                    showSearch
+                    allowClear
+                    placeholder="ห้อง"
+                    optionFilterProp="children"
+                    // onChange={value => onChange({ ...details, Room: value })}
+                    filterOption={(input, option) =>
+                      (option?.Name ?? "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    fieldNames={{ label: "Name", value: "_id" }}
+                    options={roomsList}
+                    loading={RoomLoading}
+                  />
                 </Form.Item>
               </Space>
             </Form>
@@ -254,19 +274,22 @@ function Home() {
                 <label>
                   <h2>ตารางการใช้งานห้อง</h2>
                 </label>
-                <FullCalendar
-                  plugins={[
-                    dayGridPlugin,
-                    timeGridPlugin,
-                    interactionPlugin,
-                    listPlugin,
-                  ]}
-                  headerToolbar={{
-                    left: "prevYear,nextYear prev,next today",
-                    center: "title",
-                    right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
-                  }}
-                />
+                <Col span={24}>
+                  <FullCalendar
+                    plugins={[
+                      dayGridPlugin,
+                      timeGridPlugin,
+                      interactionPlugin,
+                      listPlugin,
+                    ]}
+                    headerToolbar={{
+                      left: "prevYear,nextYear prev,next today",
+                      center: "title",
+                      right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+                    }}
+                    events={events}
+                  />
+                </Col>
                 <Modal
                   title="รายละเอียดการจอง"
                   visible={isModalVisible}
@@ -285,6 +308,7 @@ function Home() {
                   center: "",
                   right: "",
                 }}
+                events={events}
                 height={"80%"}
               />
             </Col>

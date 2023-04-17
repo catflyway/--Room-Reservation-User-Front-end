@@ -73,6 +73,13 @@ function Create() {
 
     setData({ ...data, buildingID: buildingID });
   };
+  const onChangeStartdate = (date) => {
+    console.log(`selected ${date}`);
+    if (date) {
+      setStartDate(date?.clone().startOf("day"));
+    }
+    form.resetFields(["endDate"]);
+  };
 
   const [Clickcreate, setClickcreate] = useState(true);
   const handleSubmit = (value) => {
@@ -92,7 +99,7 @@ function Create() {
 
   const [form] = Form.useForm();
   const [isAllDay, setIsAllDay] = useState(true);
-  const [startDate, setStartDate] = useState();
+  const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState();
   const [timeRange, setTimeRange] = useState([0, 24 * 60]);
   const [weekDay, setWeekDay] = useState();
@@ -304,9 +311,7 @@ function Create() {
                       >
                         <DatePicker
                           placeholder="เริ่มจอง"
-                          onChange={(date) =>
-                            setStartDate(date?.clone().startOf("day"))
-                          }
+                          onChange={onChangeStartdate}
                           value={startDate}
                           disabledDate={(value) =>
                             value && value < dayjs().endOf("day")
