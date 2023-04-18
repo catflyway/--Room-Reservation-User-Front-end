@@ -217,7 +217,7 @@ function RegisterForm() {
                   rules={[
                     { min: 6, max: 12, required: true, whitespace: true },
                   ]}
-                  hasFeedback
+                  // hasFeedback
                 >
                   <Input placeholder="Username" />
                 </Form.Item>
@@ -225,7 +225,7 @@ function RegisterForm() {
                   label="Firstname"
                   name="firstname"
                   rules={[
-                    { min: 4, max: 25, required: true, whitespace: true },
+                    { min: 6, max: 25, required: true, whitespace: true },
                   ]}
                 >
                   <Input placeholder="Firstname" />
@@ -273,7 +273,7 @@ function RegisterForm() {
                   label="Password"
                   name="password"
                   rules={[
-                    { min: 6, max: 25, required: true, whitespace: true },
+                    { min: 4, max: 25, required: true, whitespace: true },
                   ]}
                 >
                   <Input.Password placeholder="Password" />
