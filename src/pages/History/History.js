@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Tabs, Col, Row, List, Typography, Table, Modal } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Tabs, Row, Table, Select } from "antd";
 import axios from "axios";
 import dayjs from "dayjs";
 
@@ -46,31 +45,34 @@ function History() {
       key: "Purpose",
     },
     {
-      key: "Actions",
-      title: "Actions",
-      render: (record) => {
+      key: "9",
+      title: "Status",
+      dataIndex: "Status_Approve",
+      width: 200,
+      render: (value, record) => {
         return (
-          <DeleteOutlined
-            onClick={() => {
-              onDelete(record);
-            }}
-            style={{ color: "red", marginLeft: 12 }}
-          />
+          <>
+            <Select
+              value={value}
+              onChange={(newValue) => onChangeStatus(record, newValue)}
+            >
+              <Select.Option value="Pending">Pending</Select.Option>
+              <Select.Option value="Cancled ">Cancled</Select.Option>
+            </Select>
+          </>
         );
       },
     },
   ];
-
-  const onDelete = () => {
-    Modal.confirm({
-      title: "Are you sure, you want to delete this organization record?",
-      okText: "Yes",
-      okType: "danger",
-      onOk: () => {
-        return "Cancled";
-      },
+  function onChangeStatus(request, status) {
+    let data = {
+      Status_Approve: status,
+    };
+    axios.put("/Requests/" + request._id, data).then((response) => {
+      console.log(response.data);
     });
-  };
+    console.log("Change", request, status);
+  }
 
   let toto = localStorage.getItem("userData");
   let userProfle = JSON.parse(toto);

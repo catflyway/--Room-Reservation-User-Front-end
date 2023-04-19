@@ -36,7 +36,7 @@ function Room() {
   }
   const [RoomtypeList, setRoomtypeList] = useState([]);
   function getRoomtype(id) {
-    axios.get("/org/roomtype/" + id, { crossdomain: true }).then((response) => {
+    axios.get("/org/roomtype/" + id).then((response) => {
       console.log(response);
       setRoomtypeList(response.data);
     });
@@ -44,35 +44,25 @@ function Room() {
 
   const [SearchroomsList, setSearchRoomsList] = useState([]);
   function getSearchRoom(id) {
-    axios.get("/rooms/search/" + id, { crossdomain: true }).then((response) => {
+    axios.get("/rooms/search/" + id).then((response) => {
       console.log(response);
       setSearchRoomsList(response.data);
     });
   }
   const [dataSource, setDataSource] = useState([]);
   function getManageRooms(option) {
-    let query = [];
-    for (const [key, value] of Object.entries(option || {})) {
-      if (value) {
-        query.push(`${key}=${value}`);
-      }
-    }
-    query = query.join("&");
-
-    axios
-      .get("/rooms/searchby?" + query, { crossdomain: true })
-      .then((response) => {
-        console.log(response);
-        setDataSource(
-          response.data.map((item) => {
-            return {
-              ...item,
-              BuildingName: item.Building.name,
-              RoomTypeName: item.RoomType.name,
-            };
-          })
-        );
-      });
+    axios.get("/rooms/searchby", { params: option }).then((response) => {
+      console.log(response);
+      setDataSource(
+        response.data.map((item) => {
+          return {
+            ...item,
+            BuildingName: item.Building.name,
+            RoomTypeName: item.RoomType.name,
+          };
+        })
+      );
+    });
   }
 
   const onChangeorg = (orgID) => {
