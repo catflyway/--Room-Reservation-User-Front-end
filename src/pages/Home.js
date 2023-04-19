@@ -144,7 +144,7 @@ function Home() {
               <button className="col-1-1">
                 <Title style={{ color: " #FFF", fontSize: "20px" }}>1</Title>
                 <Title style={{ color: " #FFF", fontSize: "12px" }}>
-                  คำขอที่ยังไม่ได้ดำเนินการ
+                  จำนวนการจองวันนี้
                 </Title>
               </button>
             </Col>
@@ -152,16 +152,7 @@ function Home() {
               <button className="col-1-1">
                 <Title style={{ color: " #FFF", fontSize: "20px" }}>1</Title>
                 <Title style={{ color: " #FFF", fontSize: "12px" }}>
-                  คำขอที่อนุมัติแล้ว
-                </Title>
-              </button>
-            </Col>
-
-            <Col span={4} offset={2}>
-              <button className="col-1-1">
-                <Title style={{ color: " #FFF", fontSize: "20px" }}>1</Title>
-                <Title style={{ color: " #FFF", fontSize: "12px" }}>
-                  คำขอที่สำเร็จแล้ว
+                  จำนวนการจองเดือนนี้
                 </Title>
               </button>
             </Col>
