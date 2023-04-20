@@ -284,13 +284,14 @@ function Home() {
             </Col>
             <Col span={5} offset={1}>
               <h2>รายละเอียดการจอง</h2>
+
               <FullCalendar
                 plugins={[listPlugin]}
                 initialView="listMonth"
                 headerToolbar={{
-                  left: "",
+                  left: "prev,next",
                   center: "",
-                  right: "",
+                  right: "title",
                 }}
                 events={events}
                 height={"80%"}

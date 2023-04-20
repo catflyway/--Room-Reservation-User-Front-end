@@ -89,6 +89,7 @@ function Create() {
     });
     console.log(data);
     setClickcreate(false);
+    form.resetFields();
   };
   const Clicknext = (e) => {
     setClickcreate(true);

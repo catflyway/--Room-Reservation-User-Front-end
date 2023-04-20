@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Tabs, Row, Table, Select } from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 import dayjs from "dayjs";
 
@@ -50,18 +51,21 @@ function History() {
       dataIndex: "Status_Approve",
       width: 200,
       render: (value, record) => {
-        return (
-          <>
-            <Select
-              value={value}
-              onChange={(newValue) => onChangeStatus(record, newValue)}
-            >
-              <Select.Option value="Pending">Pending</Select.Option>
-              <Select.Option value="Cancled ">Cancled</Select.Option>
-            </Select>
-          </>
-        );
+        return <DeleteOutlined style={{ color: "red", marginLeft: 12 }} />;
       },
+      // render: (value, record) => {
+      //   return (
+      //     <>
+      //       <Select
+      //         value={value}
+      //         onChange={(newValue) => onChangeStatus(record, newValue)}
+      //       >
+      //         <Select.Option value="Pending">Pending</Select.Option>
+      //         <Select.Option value="Cancled">Cancled</Select.Option>
+      //       </Select>
+      //     </>
+      //   );
+      // },
     },
   ];
   function onChangeStatus(request, status) {
@@ -139,7 +143,7 @@ function History() {
   function gethistoryRejectOrCancel() {
     axios
       .get(
-        "requests/searchby?Status_Approve=Cancled&Status_Approve=Rejected&UserID=" +
+        "requests/searchby?Status_Approve=Cancled&Status_Approve=Cancled&UserID=" +
           userProfle._id
       )
       .then((response) => {

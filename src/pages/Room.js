@@ -67,8 +67,12 @@ function Room() {
 
   const onChangeorg = (orgID) => {
     console.log(`selected ${orgID}`);
-    getBuildingInOrgID(orgID);
-    getRoomtype(orgID);
+    if (orgID) {
+      getBuildingInOrgID(orgID);
+      getRoomtype(orgID);
+    }
+    form.resetFields(["BuildingID"]);
+    form.resetFields(["RoomTypeID"]);
   };
   const onChangebuild = (buildingID) => {
     console.log(`selected ${buildingID}`);
