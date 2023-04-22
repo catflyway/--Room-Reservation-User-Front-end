@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import {
   Form,
   Input,
@@ -13,12 +13,18 @@ import {
   Checkbox,
   Segmented,
   Result,
+  Typography,
 } from "antd";
 import dayjs from "dayjs";
 import axios from "axios";
 import { SmileOutlined } from "@ant-design/icons";
+import { useLocation } from "react-router-dom";
+
+const { Title } = Typography;
 
 function Create() {
+  const location = useLocation();
+
   const [data, setData] = useState({
     Room: "",
     Building: "",
@@ -81,18 +87,18 @@ function Create() {
     form.resetFields(["endDate"]);
   };
 
-  const [Clickcreate, setClickcreate] = useState(true);
+  const [isCreated, setIsCreated] = useState(true);
   const handleSubmit = (value) => {
     console.log(value);
     axios.post("/Requests", data).then((response) => {
       console.log(response.data);
     });
     console.log(data);
-    setClickcreate(false);
+    setIsCreated(false);
     form.resetFields();
   };
   const Clicknext = (e) => {
-    setClickcreate(true);
+    setIsCreated(true);
     console.log("5555");
   };
 
@@ -158,13 +164,13 @@ function Create() {
     let startTime = [];
     let endTime = [];
 
-    if (startDate && timeRange && repeatPattern == "norepeat") {
+    if (startDate && timeRange && repeatPattern === "norepeat") {
       let range = getTimeRange(startDate);
       startTime = [range[0]];
       endTime = [range[1]];
-    } else if (startDate && endDate && timeRange && repeatPattern == "days") {
+    } else if (startDate && endDate && timeRange && repeatPattern === "days") {
       [startTime, endTime] = getTimeRangeInterval(1);
-    } else if (startDate && endDate && timeRange && repeatPattern == "weeks") {
+    } else if (startDate && endDate && timeRange && repeatPattern === "weeks") {
       [startTime, endTime] = getTimeRangeInterval(7);
     }
 
@@ -178,272 +184,262 @@ function Create() {
   }, [repeatPattern, startDate, endDate, timeRange]);
 
   return (
-    <div className="App">
-      <div className="User-list">
-        <div className="Heard-Manageano">
-          <h1>Create</h1>
-        </div>
-        {Clickcreate == true ? (
-          <>
-            <Row>
-              <Col span={12} offset={6}>
-                <Form
-                  form={form}
-                  labelCol={{
-                    span: 6,
-                  }}
-                  wrapperCol={{
-                    span: 18,
-                  }}
-                  layout="horizontal"
-                  onFinish={handleSubmit}
-                >
+    <Fragment>
+      <Row align={"center"}>
+        <Title>Create {location.state}</Title>
+      </Row>
+      {isCreated === true ? (
+        <Row align={"center"}>
+          <Col style={{ maxWidth: "500px" }} span={24}>
+            <Form
+              form={form}
+              labelCol={{
+                span: 6,
+              }}
+              wrapperCol={{
+                span: 18,
+              }}
+              layout="horizontal"
+              onFinish={handleSubmit}
+            >
+              <Form.Item
+                label="หน่วยงาน"
+                name="หน่วยงาน"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your Organization!",
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  placeholder="หน่วยงาน"
+                  optionFilterProp="children"
+                  onChange={onChangeorg}
+                  filterOption={(input, option) =>
+                    (option?.name ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  fieldNames={{ label: "name", value: "_id" }}
+                  options={orgList}
+                />
+              </Form.Item>
+              <Form.Item
+                label="อาคาร/สถานที่"
+                name="อาคาร/สถานที่"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your Building!",
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  placeholder="อาคาร/สถานที่"
+                  optionFilterProp="children"
+                  onChange={onChangebuild}
+                  filterOption={(input, option) =>
+                    (option?.name ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  fieldNames={{ label: "name", value: "_id" }}
+                  options={buildingList}
+                />
+              </Form.Item>
+              <Form.Item
+                label="ห้อง"
+                name="ห้อง"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your Room!",
+                  },
+                ]}
+              >
+                <Select
+                  showSearch
+                  placeholder="ห้อง"
+                  optionFilterProp="children"
+                  onChange={(value) => setData({ ...data, Room: value })}
+                  filterOption={(input, option) =>
+                    (option?.Name ?? "")
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }
+                  fieldNames={{ label: "Name", value: "_id" }}
+                  options={roomsList}
+                />
+              </Form.Item>
+              <Form.Item label="เวลาการจอง">
+                <Space direction="vertical">
+                  <Checkbox
+                    name="TimeRange"
+                    checked={isAllDay}
+                    onChange={(e) => setIsAllDay(e.target.checked)}
+                  >
+                    Allday
+                  </Checkbox>
+                  {!isAllDay ? (
+                    <Form.Item
+                      name="time"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input your reservation timing!",
+                        },
+                      ]}
+                    >
+                      <TimePicker.RangePicker
+                        onChange={onChangeTimeRange}
+                        format="HH:mm"
+                      />
+                    </Form.Item>
+                  ) : (
+                    ""
+                  )}
+                </Space>
+              </Form.Item>
+              <Form.Item label="วันจอง">
+                <Space direction="vertical">
                   <Form.Item
-                    label="หน่วยงาน"
-                    name="หน่วยงาน"
+                    name="startDate"
                     rules={[
                       {
                         required: true,
-                        message: "Please input your Organization!",
+                        message: "Please input your StartDate!",
                       },
                     ]}
                   >
-                    <Select
-                      showSearch
-                      placeholder="หน่วยงาน"
-                      optionFilterProp="children"
-                      onChange={onChangeorg}
-                      filterOption={(input, option) =>
-                        (option?.name ?? "")
-                          .toLowerCase()
-                          .includes(input.toLowerCase())
+                    <DatePicker
+                      placeholder="เริ่มจอง"
+                      onChange={onChangeStartdate}
+                      value={startDate}
+                      disabledDate={(value) =>
+                        value && value < dayjs().endOf("day")
                       }
-                      fieldNames={{ label: "name", value: "_id" }}
-                      options={orgList}
                     />
                   </Form.Item>
-                  <Form.Item
-                    label="อาคาร/สถานที่"
-                    name="อาคาร/สถานที่"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your Building!",
-                      },
-                    ]}
+                  <Radio.Group
+                    value={repeatPattern}
+                    onChange={(e) => setRepeatPattern(e.target.value)}
                   >
-                    <Select
-                      showSearch
-                      placeholder="อาคาร/สถานที่"
-                      optionFilterProp="children"
-                      onChange={onChangebuild}
-                      filterOption={(input, option) =>
-                        (option?.name ?? "")
-                          .toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                      fieldNames={{ label: "name", value: "_id" }}
-                      options={buildingList}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    label="ห้อง"
-                    name="ห้อง"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your Room!",
-                      },
-                    ]}
-                  >
-                    <Select
-                      showSearch
-                      placeholder="ห้อง"
-                      optionFilterProp="children"
-                      onChange={(value) => setData({ ...data, Room: value })}
-                      filterOption={(input, option) =>
-                        (option?.Name ?? "")
-                          .toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                      fieldNames={{ label: "Name", value: "_id" }}
-                      options={roomsList}
-                    />
-                  </Form.Item>
-                  <Form.Item label="เวลาการจอง">
-                    <Space direction="vertical">
-                      <Checkbox
-                        name="TimeRange"
-                        checked={isAllDay}
-                        onChange={(e) => setIsAllDay(e.target.checked)}
-                      >
-                        Allday
-                      </Checkbox>
-                      {!isAllDay ? (
-                        <Form.Item
-                          name="time"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please input your reservation timing!",
-                            },
-                          ]}
-                        >
-                          <TimePicker.RangePicker
-                            onChange={onChangeTimeRange}
-                            format="HH:mm"
-                          />
-                        </Form.Item>
-                      ) : (
-                        ""
-                      )}
-                    </Space>
-                  </Form.Item>
-                  <Form.Item label="วันจอง">
-                    <Space direction="vertical">
+                    <Radio.Button value="norepeat">
+                      Does not repeat
+                    </Radio.Button>
+                    <Radio.Button value="days">everyday</Radio.Button>
+                    <Radio.Button value="weeks">everyweek</Radio.Button>
+                  </Radio.Group>
+                  {repeatPattern === "days" ? (
+                    <Form.Item
+                      name="endDate"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input your EndDate!",
+                        },
+                      ]}
+                    >
+                      <DatePicker
+                        onChange={(date) =>
+                          setEndDate(date?.clone().add(1, "day").startOf("day"))
+                        }
+                        placeholder="วันสิ้นการจอง"
+                        disabledDate={(value) => value && value < startDate}
+                      />
+                    </Form.Item>
+                  ) : repeatPattern === "weeks" ? (
+                    <>
+                      <Segmented
+                        size="large"
+                        options={datOfWeekString}
+                        value={weekDay}
+                        disabled
+                      />
                       <Form.Item
-                        name="startDate"
+                        name="endDate"
                         rules={[
                           {
                             required: true,
-                            message: "Please input your StartDate!",
+                            message: "Please input your EndDate!",
                           },
                         ]}
                       >
                         <DatePicker
-                          placeholder="เริ่มจอง"
-                          onChange={onChangeStartdate}
-                          value={startDate}
+                          onChange={(date) =>
+                            setEndDate(
+                              date?.clone().add(1, "day").startOf("day")
+                            )
+                          }
+                          placeholder="วันสิ้นสุดสัปดาห์"
                           disabledDate={(value) =>
-                            value && value < dayjs().endOf("day")
+                            value &&
+                            startDate &&
+                            (value < startDate ||
+                              value.day() !== startDate.day())
                           }
                         />
                       </Form.Item>
-                      <Radio.Group
-                        value={repeatPattern}
-                        onChange={(e) => setRepeatPattern(e.target.value)}
-                      >
-                        <Radio.Button value="norepeat">
-                          Does not repeat
-                        </Radio.Button>
-                        <Radio.Button value="days">everyday</Radio.Button>
-                        <Radio.Button value="weeks">everyweek</Radio.Button>
-                      </Radio.Group>
-                      {repeatPattern == "days" ? (
-                        <Form.Item
-                          name="endDate"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please input your EndDate!",
-                            },
-                          ]}
-                        >
-                          <DatePicker
-                            onChange={(date) =>
-                              setEndDate(
-                                date?.clone().add(1, "day").startOf("day")
-                              )
-                            }
-                            placeholder="วันสิ้นการจอง"
-                            disabledDate={(value) => value && value < startDate}
-                          />
-                        </Form.Item>
-                      ) : repeatPattern == "weeks" ? (
-                        <>
-                          <Segmented
-                            size="large"
-                            options={datOfWeekString}
-                            value={weekDay}
-                            disabled
-                          />
-                          <Form.Item
-                            name="endDate"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Please input your EndDate!",
-                              },
-                            ]}
-                          >
-                            <DatePicker
-                              onChange={(date) =>
-                                setEndDate(
-                                  date?.clone().add(1, "day").startOf("day")
-                                )
-                              }
-                              placeholder="วันสิ้นสุดสัปดาห์"
-                              disabledDate={(value) =>
-                                value &&
-                                startDate &&
-                                (value < startDate ||
-                                  value.day() != startDate.day())
-                              }
-                            />
-                          </Form.Item>
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </Space>
-                  </Form.Item>
-                  <Form.Item label="ผู้จอง">
-                    <Input
-                      placeholder="ผู้จอง"
-                      disabled
-                      value={usersFirstname}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    label="วัตถุประสงค์"
-                    name="วัตถุประสงค์"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your Purpose!",
-                      },
-                    ]}
-                  >
-                    <Input
-                      placeholder="วัตถุประสงค์"
-                      onChange={(e) =>
-                        setData({ ...data, Purpose: e.target.value })
-                      }
-                      value={data?.Purpose}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    wrapperCol={{
-                      offset: 8,
-                      span: 16,
-                    }}
-                  >
-                    <Row>
-                      <Col span={8}></Col>
-                      <Col span={2}>
-                        <Button type="primary" htmlType="submit">
-                          สร้างการจอง
-                        </Button>
-                      </Col>
-                    </Row>
-                  </Form.Item>
-                </Form>
-              </Col>
-            </Row>
-          </>
-        ) : (
-          <Result
-            icon={<SmileOutlined />}
-            title="Your reservation has been made! ^_^"
-            extra={
-              <Button type="primary" onClick={Clicknext}>
-                Next
-              </Button>
-            }
-          />
-        )}
-      </div>
-    </div>
+                    </>
+                  ) : (
+                    ""
+                  )}
+                </Space>
+              </Form.Item>
+              <Form.Item label="ผู้จอง">
+                <Input placeholder="ผู้จอง" disabled value={usersFirstname} />
+              </Form.Item>
+              <Form.Item
+                label="วัตถุประสงค์"
+                name="วัตถุประสงค์"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your Purpose!",
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="วัตถุประสงค์"
+                  onChange={(e) =>
+                    setData({ ...data, Purpose: e.target.value })
+                  }
+                  value={data?.Purpose}
+                />
+              </Form.Item>
+              <Form.Item
+                wrapperCol={{
+                  offset: 8,
+                  span: 16,
+                }}
+              >
+                <Row>
+                  <Col span={8}></Col>
+                  <Col span={2}>
+                    <Button type="primary" htmlType="submit">
+                      สร้างการจอง
+                    </Button>
+                  </Col>
+                </Row>
+              </Form.Item>
+            </Form>
+          </Col>
+        </Row>
+      ) : (
+        <Result
+          icon={<SmileOutlined />}
+          title="Your reservation has been made! ^_^"
+          extra={
+            <Button type="primary" onClick={Clicknext}>
+              Next
+            </Button>
+          }
+        />
+      )}
+    </Fragment>
   );
 }
 

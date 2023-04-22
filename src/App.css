@@ -2,9 +2,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
 
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
   font-family: 'Lato', sans-serif;
 }
 
@@ -415,4 +412,9 @@ table{
   width: 100%;
   display: block;
   text-align: center;
+}
+
+.site-layout-content {
+  min-height: 280px;
+  padding: 36px;
 }

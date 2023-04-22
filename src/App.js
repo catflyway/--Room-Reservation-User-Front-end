@@ -10,7 +10,7 @@ import { MenuItems } from "./conponents/MenuItems";
 import LoginForm from "./conponents/LoginForm";
 import RegisterForm from "./conponents/RegisterForm";
 
-import { UserContext} from "./user-context";
+import { UserContext } from "./user-context";
 const { Header, Content, Footer } = Layout;
 
 const allowRole = ["User", "Room Contributor"];
@@ -46,9 +46,7 @@ function App() {
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${response.data.token}`;
-          setUserlogin(
-            response.data
-          );
+          setUserlogin(response.data);
 
           localStorage.setItem("userData", JSON.stringify(response.data));
         } else {
@@ -64,7 +62,7 @@ function App() {
   };
   return (
     <UserContext.Provider value={userlogin}>
-       <ConfigProvider
+      <ConfigProvider
         theme={{
           components: {
             Button: {
@@ -76,13 +74,13 @@ function App() {
           },
         }}
       >
-      {userlogin.email !== "" ? (
-        <BrowserRouter>
-         <Layout className="layout">
+        {userlogin.email !== "" ? (
+          <BrowserRouter>
+            <Layout className="layout">
               <Header>
-          <Navbar />
-          </Header>
-          <Content
+                <Navbar />
+              </Header>
+              <Content
                 style={{
                   padding: "0 50px",
                 }}
@@ -91,8 +89,8 @@ function App() {
                   className="site-layout-content"
                   style={{ background: "#FFF" }}
                 >
-          <Routes>
-          {MenuItems.map((item, index) => {
+                  <Routes>
+                    {MenuItems.map((item, index) => {
                       if (!item.role.includes(userlogin.role)) {
                         return undefined;
                       }
@@ -111,15 +109,15 @@ function App() {
                         <Navigate to="/" replace />
                       }
                     />
-            {/* <Route path="/" element={<Home />} />
+                    {/* <Route path="/" element={<Home />} />
             <Route path="/Rooms" element={<Room />} />
             <Route path="/Create" element={<Create />} />
             <Route path="/History" element={<History />} />
             <Route path="/Profiles" element={<Profile />} />
             <Route path="*" element={<Navigate to="/" replace />} /> */}
-          </Routes>
-          </div>
-          </Content>
+                  </Routes>
+                </div>
+              </Content>
 
               <Footer
                 style={{
@@ -127,16 +125,19 @@ function App() {
                 }}
               ></Footer>
             </Layout>
-        </BrowserRouter>
-      ) : (
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LoginForm Loginuser={Loginuser} error={error} />} />
-            <Route path="/register" element={<RegisterForm/>} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </BrowserRouter>
-      )}
+          </BrowserRouter>
+        ) : (
+          <BrowserRouter>
+            <Routes>
+              <Route
+                path="/"
+                element={<LoginForm Loginuser={Loginuser} error={error} />}
+              />
+              <Route path="/register" element={<RegisterForm />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+        )}
       </ConfigProvider>
     </UserContext.Provider>
   );

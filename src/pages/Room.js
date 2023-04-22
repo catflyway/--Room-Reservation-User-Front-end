@@ -14,9 +14,11 @@ import {
   Space,
   Input,
 } from "antd";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Room() {
+  let navigate = useNavigate();
   const { Search } = Input;
 
   const [form] = Form.useForm();
@@ -74,12 +76,6 @@ function Room() {
     form.resetFields(["BuildingID"]);
     form.resetFields(["RoomTypeID"]);
   };
-  const onChangebuild = (buildingID) => {
-    console.log(`selected ${buildingID}`);
-  };
-  const onChangeroomtype = (roomtypeID) => {
-    console.log(`selected ${roomtypeID}`);
-  };
   useEffect(() => {
     getManageRooms();
     getOrg();
@@ -99,7 +95,13 @@ function Room() {
     (o) => !selectedItems.includes(o)
   );
   const onFilterChange = (changedValues, allValues) => {
-    console.log(changedValues, allValues);
+    if (changedValues.hasOwnProperty("OrgID")) {
+      onChangeorg(changedValues.OrgID);
+      allValues.BuildingID = undefined;
+      changedValues.BuildingID = undefined;
+      allValues.RoomTypeID = undefined;
+      changedValues.RoomTypeID = undefined;
+    }
     getManageRooms(allValues);
   };
 
@@ -121,7 +123,6 @@ function Room() {
                   showSearch
                   placeholder="หน่วยงาน"
                   optionFilterProp="children"
-                  onChange={onChangeorg}
                   filterOption={(input, option) =>
                     (option?.name ?? "")
                       .toLowerCase()
@@ -141,7 +142,6 @@ function Room() {
                   showSearch
                   placeholder="อาคาร/สถานที่"
                   optionFilterProp="children"
-                  onChange={onChangebuild}
                   filterOption={(input, option) =>
                     (option?.name ?? "")
                       .toLowerCase()
@@ -161,7 +161,6 @@ function Room() {
                   showSearch
                   placeholder="ประเภทห้อง"
                   optionFilterProp="children"
-                  onChange={onChangeroomtype}
                   filterOption={(input, option) =>
                     (option?.name ?? "")
                       .toLowerCase()
@@ -287,6 +286,17 @@ function Room() {
                 {modalData?.Contributor?.name}
               </Descriptions.Item>
             </Descriptions>
+            <br />
+            <Row justify="center">
+              <Button
+                type="primary"
+                onClick={() => {
+                  navigate("/Create", { state: modalData?._id });
+                }}
+              >
+                สร้างการจอง
+              </Button>
+            </Row>
           </Modal>
         </div>
       </div>
