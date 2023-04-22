@@ -6,8 +6,8 @@ import { UserContext } from "../user-context";
 import "./Navbar.css";
 
 const Navbar = () => {
-  let user = useContext(UserContext);
-  let location = useLocation();
+  const user = useContext(UserContext);
+  const location = useLocation();
 
   return (
     <Menu

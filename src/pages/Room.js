@@ -291,7 +291,7 @@ function Room() {
               <Button
                 type="primary"
                 onClick={() => {
-                  navigate("/Create", { state: modalData?._id });
+                  navigate("/Create", { state: { room: modalData } });
                 }}
               >
                 สร้างการจอง

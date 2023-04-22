@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, useContext } from "react";
 import {
   Form,
   Input,
@@ -9,7 +9,6 @@ import {
   Button,
   TimePicker,
   Radio,
-  Space,
   Checkbox,
   Segmented,
   Result,
@@ -19,124 +18,83 @@ import dayjs from "dayjs";
 import axios from "axios";
 import { SmileOutlined } from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
+import { UserContext } from "../user-context";
 
 const { Title } = Typography;
+const { RangePicker } = DatePicker;
 
 function Create() {
+  const user = useContext(UserContext);
+  const [form] = Form.useForm();
   const location = useLocation();
 
-  const [data, setData] = useState({
-    Room: "",
-    Building: "",
-    UserID: "",
-    startTime: [],
-    endTime: [],
-    allDay: false,
-    Purpose: "",
-    repeatDate: "",
-  });
   const [orgList, setOrgList] = useState([]);
   function getOrg() {
     axios.get("/org").then((response) => {
-      console.log(response);
       setOrgList(response.data);
     });
   }
+
   const [buildingList, setBuildingList] = useState([]);
   function getBuildingInOrgID(id) {
     axios.get("/org/building/" + id).then((response) => {
-      console.log(response);
       setBuildingList(response.data);
     });
   }
+
   const [roomsList, setRoomsList] = useState([]);
-  function getRoomsInOrgID(id) {
+  function getRoomsInBuildingID(id) {
     axios.get("/rooms/buildingroom/" + id).then((response) => {
-      console.log(response);
       setRoomsList(response.data);
     });
   }
-  const [usersFirstname, setUsersFirstname] = useState(() => {
-    let toto = localStorage.getItem("userData");
-    let userProfle = JSON.parse(toto);
-    setData({ ...data, UserID: userProfle._id });
-    return userProfle.firstname;
-  });
-
-  useEffect(() => {
-    getOrg();
-  }, []);
 
   const onChangeorg = (orgID) => {
-    console.log(`selected ${orgID}`);
     getBuildingInOrgID(orgID);
-
-    setData({ ...data, OrgID: orgID });
   };
   const onChangebuild = (buildingID) => {
-    console.log(`selected ${buildingID}`);
-    getRoomsInOrgID(buildingID);
-
-    setData({ ...data, buildingID: buildingID });
+    getRoomsInBuildingID(buildingID);
   };
-  const onChangeStartdate = (date) => {
-    console.log(`selected ${date}`);
-    if (date) {
-      setStartDate(date?.clone().startOf("day"));
+
+  const [dateRangeDisable, setDateRangeDisable] = useState([false, true]);
+
+  const dateRange = Form.useWatch("dateRange", form);
+  const repeatDate = Form.useWatch("repeatDate", form);
+  React.useEffect(() => {
+    if (!dateRange) return;
+    if (repeatDate === "norepeat") {
+      setDateRangeDisable([false, true]);
+      form.setFieldValue("dateRange", [dateRange[0], null]);
+    } else {
+      setDateRangeDisable([false, false]);
+      if (!dateRange[1]) {
+        form.setFieldValue("dateRange", [
+          dateRange[0],
+          dateRange[0].add(1, "month"),
+        ]);
+      }
     }
-    form.resetFields(["endDate"]);
-  };
+  }, [repeatDate]);
 
-  const [isCreated, setIsCreated] = useState(true);
+  const [isCreated, setIsCreated] = useState(false);
   const handleSubmit = (value) => {
-    console.log(value);
-    axios.post("/Requests", data).then((response) => {
-      console.log(response.data);
-    });
-    console.log(data);
-    setIsCreated(false);
-    form.resetFields();
-  };
-  const Clicknext = (e) => {
-    setIsCreated(true);
-    console.log("5555");
-  };
+    let timeRange = [0, 24 * 60];
 
-  const datOfWeekString = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
-
-  const [form] = Form.useForm();
-  const [isAllDay, setIsAllDay] = useState(true);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState();
-  const [timeRange, setTimeRange] = useState([0, 24 * 60]);
-  const [weekDay, setWeekDay] = useState();
-  const [repeatPattern, setRepeatPattern] = useState("norepeat");
-
-  const onChangeTimeRange = (timesrt, timeString) => {
-    let startDiff = timesrt[0]?.diff(
-      timesrt[0].clone().startOf("day"),
-      "minute"
-    );
-    let stopDiff = timesrt[1]?.diff(
-      timesrt[1].clone().startOf("day"),
-      "minute"
-    );
-    setTimeRange([startDiff, stopDiff]);
-  };
-
-  React.useEffect(() => {
-    if (startDate) {
-      setWeekDay(datOfWeekString[startDate.day()]);
+    if (!value.allDay) {
+      let startDiff = value.timeRange[0]?.diff(
+        value.timeRange[0].clone().startOf("day"),
+        "minute"
+      );
+      let stopDiff = value.timeRange[1]?.diff(
+        value.timeRange[1].clone().startOf("day"),
+        "minute"
+      );
+      timeRange = [startDiff, stopDiff];
     }
-  }, [startDate]);
 
-  React.useEffect(() => {
-    if (isAllDay) {
-      setTimeRange([0, 24 * 60]);
-    }
-  }, [isAllDay]);
+    const startDate = value.dateRange[0];
+    const endDate = value.dateRange[1];
 
-  React.useEffect(() => {
     let getTimeRange = (day) => {
       let start = [
         day.clone().add(timeRange[0], "minute").format("YYYY-MM-DDTHH:mm:ssZ"),
@@ -164,31 +122,56 @@ function Create() {
     let startTime = [];
     let endTime = [];
 
-    if (startDate && timeRange && repeatPattern === "norepeat") {
+    if (startDate && value.repeatDate === "norepeat") {
       let range = getTimeRange(startDate);
       startTime = [range[0]];
       endTime = [range[1]];
-    } else if (startDate && endDate && timeRange && repeatPattern === "days") {
+    } else if (startDate && endDate && value.repeatDate === "days") {
       [startTime, endTime] = getTimeRangeInterval(1);
-    } else if (startDate && endDate && timeRange && repeatPattern === "weeks") {
+    } else if (startDate && endDate && value.repeatDate === "weeks") {
       [startTime, endTime] = getTimeRangeInterval(7);
     }
 
-    setData({
-      ...data,
-      allDay: isAllDay,
-      repeatDate: repeatPattern,
+    value = {
+      ...value,
       startTime,
       endTime,
+      dateRange: undefined,
+      timeRange: undefined,
+      OrgID: undefined,
+      UserID: user._id,
+    };
+
+    axios.post("/Requests", value).then((response) => {
+      setIsCreated(true);
+      form.resetFields();
     });
-  }, [repeatPattern, startDate, endDate, timeRange]);
+  };
+  const Clicknext = (e) => {
+    setIsCreated(false);
+  };
+
+  const datOfWeekString = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+
+  useEffect(() => {
+    getOrg();
+  }, []);
+
+  useEffect(() => {
+    if (!location.state) return;
+    const room = location.state.room;
+
+    form.resetFields();
+    onChangeorg(room.Org.id);
+    onChangebuild(room.Building.id);
+  }, [location.state]);
 
   return (
     <Fragment>
       <Row align={"center"}>
-        <Title>Create {location.state}</Title>
+        <Title>Create</Title>
       </Row>
-      {isCreated === true ? (
+      {!isCreated ? (
         <Row align={"center"}>
           <Col style={{ maxWidth: "500px" }} span={24}>
             <Form
@@ -204,13 +187,14 @@ function Create() {
             >
               <Form.Item
                 label="หน่วยงาน"
-                name="หน่วยงาน"
+                name="OrgID"
                 rules={[
                   {
                     required: true,
                     message: "Please input your Organization!",
                   },
                 ]}
+                initialValue={location.state?.room?.Org.id}
               >
                 <Select
                   showSearch
@@ -228,13 +212,14 @@ function Create() {
               </Form.Item>
               <Form.Item
                 label="อาคาร/สถานที่"
-                name="อาคาร/สถานที่"
+                name="Building"
                 rules={[
                   {
                     required: true,
                     message: "Please input your Building!",
                   },
                 ]}
+                initialValue={location.state?.room?.Building.id}
               >
                 <Select
                   showSearch
@@ -252,19 +237,19 @@ function Create() {
               </Form.Item>
               <Form.Item
                 label="ห้อง"
-                name="ห้อง"
+                name="Room"
                 rules={[
                   {
                     required: true,
                     message: "Please input your Room!",
                   },
                 ]}
+                initialValue={location.state?.room?._id}
               >
                 <Select
                   showSearch
                   placeholder="ห้อง"
                   optionFilterProp="children"
-                  onChange={(value) => setData({ ...data, Room: value })}
                   filterOption={(input, option) =>
                     (option?.Name ?? "")
                       .toLowerCase()
@@ -274,127 +259,109 @@ function Create() {
                   options={roomsList}
                 />
               </Form.Item>
-              <Form.Item label="เวลาการจอง">
-                <Space direction="vertical">
-                  <Checkbox
-                    name="TimeRange"
-                    checked={isAllDay}
-                    onChange={(e) => setIsAllDay(e.target.checked)}
-                  >
-                    Allday
-                  </Checkbox>
-                  {!isAllDay ? (
+              <Form.Item
+                label="วันจอง"
+                name="dateRange"
+                initialValue={[dayjs(), null]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your StartDate!",
+                  },
+                ]}
+              >
+                <RangePicker
+                  allowClear={false}
+                  placeholder={[
+                    "เริ่ม",
+                    dateRangeDisable[1]
+                      ? dateRange?.[0]?.format("YYYY-MM-DD")
+                      : "สิ้นสุด",
+                  ]}
+                  defaultPickerValue={[dayjs(), null]}
+                  disabledDate={(value) =>
+                    value && value < dayjs().endOf("day")
+                  }
+                  disabled={dateRangeDisable}
+                  allowEmpty={dateRangeDisable}
+                  cellRender={(current) => {
+                    const style = {};
+                    if (
+                      repeatDate === "weeks" &&
+                      current.day() === dateRange?.[0]?.day()
+                    ) {
+                      style.border = "1px solid #1890ff";
+                      style.borderRadius = "50%";
+                    }
+                    return (
+                      <div className="ant-picker-cell-inner" style={style}>
+                        {current.date()}
+                      </div>
+                    );
+                  }}
+                />
+              </Form.Item>
+              <Form.Item
+                label="การเกิดซ้ำ"
+                name="repeatDate"
+                initialValue="norepeat"
+              >
+                <Radio.Group>
+                  <Radio.Button value="norepeat">Does not repeat</Radio.Button>
+                  <Radio.Button value="days">everyday</Radio.Button>
+                  <Radio.Button value="weeks">everyweek</Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+              {repeatDate === "weeks" ? (
+                <Form.Item wrapperCol={{ span: 18, offset: 6 }}>
+                  <Segmented
+                    size="large"
+                    options={datOfWeekString}
+                    value={datOfWeekString[dateRange?.[0]?.day()]}
+                    disabled
+                  />
+                </Form.Item>
+              ) : null}
+              <Form.Item
+                label="เวลาการจอง"
+                name="allDay"
+                valuePropName="checked"
+                initialValue={true}
+                style={{ marginBottom: "0" }}
+              >
+                <Checkbox name="TimeRange">Allday</Checkbox>
+              </Form.Item>
+              <Form.Item
+                noStyle
+                shouldUpdate={(prevValues, currentValues) =>
+                  prevValues.allDay !== currentValues.allDay
+                }
+              >
+                {({ getFieldValue }) =>
+                  getFieldValue("allDay") !== true ? (
                     <Form.Item
-                      name="time"
+                      name="timeRange"
                       rules={[
                         {
                           required: true,
                           message: "Please input your reservation timing!",
                         },
                       ]}
+                      wrapperCol={{ span: 18, offset: 6 }}
                     >
-                      <TimePicker.RangePicker
-                        onChange={onChangeTimeRange}
-                        format="HH:mm"
-                      />
+                      <TimePicker.RangePicker format="HH:mm" />
                     </Form.Item>
                   ) : (
-                    ""
-                  )}
-                </Space>
-              </Form.Item>
-              <Form.Item label="วันจอง">
-                <Space direction="vertical">
-                  <Form.Item
-                    name="startDate"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your StartDate!",
-                      },
-                    ]}
-                  >
-                    <DatePicker
-                      placeholder="เริ่มจอง"
-                      onChange={onChangeStartdate}
-                      value={startDate}
-                      disabledDate={(value) =>
-                        value && value < dayjs().endOf("day")
-                      }
-                    />
-                  </Form.Item>
-                  <Radio.Group
-                    value={repeatPattern}
-                    onChange={(e) => setRepeatPattern(e.target.value)}
-                  >
-                    <Radio.Button value="norepeat">
-                      Does not repeat
-                    </Radio.Button>
-                    <Radio.Button value="days">everyday</Radio.Button>
-                    <Radio.Button value="weeks">everyweek</Radio.Button>
-                  </Radio.Group>
-                  {repeatPattern === "days" ? (
-                    <Form.Item
-                      name="endDate"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input your EndDate!",
-                        },
-                      ]}
-                    >
-                      <DatePicker
-                        onChange={(date) =>
-                          setEndDate(date?.clone().add(1, "day").startOf("day"))
-                        }
-                        placeholder="วันสิ้นการจอง"
-                        disabledDate={(value) => value && value < startDate}
-                      />
-                    </Form.Item>
-                  ) : repeatPattern === "weeks" ? (
-                    <>
-                      <Segmented
-                        size="large"
-                        options={datOfWeekString}
-                        value={weekDay}
-                        disabled
-                      />
-                      <Form.Item
-                        name="endDate"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please input your EndDate!",
-                          },
-                        ]}
-                      >
-                        <DatePicker
-                          onChange={(date) =>
-                            setEndDate(
-                              date?.clone().add(1, "day").startOf("day")
-                            )
-                          }
-                          placeholder="วันสิ้นสุดสัปดาห์"
-                          disabledDate={(value) =>
-                            value &&
-                            startDate &&
-                            (value < startDate ||
-                              value.day() !== startDate.day())
-                          }
-                        />
-                      </Form.Item>
-                    </>
-                  ) : (
-                    ""
-                  )}
-                </Space>
+                    <div style={{ height: "24px" }}></div>
+                  )
+                }
               </Form.Item>
               <Form.Item label="ผู้จอง">
-                <Input placeholder="ผู้จอง" disabled value={usersFirstname} />
+                <Input placeholder="ผู้จอง" disabled value={user.firstname} />
               </Form.Item>
               <Form.Item
                 label="วัตถุประสงค์"
-                name="วัตถุประสงค์"
+                name="Purpose"
                 rules={[
                   {
                     required: true,
@@ -402,13 +369,7 @@ function Create() {
                   },
                 ]}
               >
-                <Input
-                  placeholder="วัตถุประสงค์"
-                  onChange={(e) =>
-                    setData({ ...data, Purpose: e.target.value })
-                  }
-                  value={data?.Purpose}
-                />
+                <Input placeholder="วัตถุประสงค์" />
               </Form.Item>
               <Form.Item
                 wrapperCol={{
