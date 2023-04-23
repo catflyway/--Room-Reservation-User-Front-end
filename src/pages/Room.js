@@ -171,18 +171,6 @@ function Room() {
                   options={RoomtypeList}
                 />
               </Form.Item>
-
-
-              <Form.Item label="Search" name={''}>
-          <Radio.Group>
-            <Radio value="apple"> Apple </Radio>
-            {/* <Radio value="pear"> Pear </Radio>
-            <Radio value="pear"> Pear </Radio>
-            <Radio value="pear"> Pear </Radio>
-            <Radio value="pear"> Pear </Radio>
-            <Radio value="pear"> Pear </Radio> */}
-          </Radio.Group>
-          </Form.Item>
               <Form.Item name="Name">
                 <Search
                   placeholder="Search Room"
