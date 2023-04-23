@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./conponents/Navbar";
 import "./App.css";
 import axios from "axios";
-import { Layout, ConfigProvider } from "antd";
+import { Layout, ConfigProvider ,Spin, message} from "antd";
 
 import { MenuItems } from "./conponents/MenuItems";
 
@@ -13,9 +13,38 @@ import RegisterForm from "./conponents/RegisterForm";
 import { UserContext } from "./user-context";
 const { Header, Content, Footer } = Layout;
 
+
 const allowRole = ["User", "Room Contributor"];
 
 function App() {
+  const [loadingCount, setLoadingCount] = useState(0);
+
+useEffect(() => {
+  // Add a request interceptor
+  axios.interceptors.request.use(function (config) {
+    // Do something before request is sent
+    setLoadingCount((state, props) => (state + 1))
+    return config;
+  }, function (error) {
+    // Do something with request error
+    return Promise.reject(error);
+  });
+
+  // Add a response interceptor
+  axios.interceptors.response.use(function (response) {
+    // Any status code that lie within the range of 2xx cause this function to trigger
+    // Do something with response data
+    setLoadingCount((state, props) => (state - 1))
+    return response;
+  }, function (error) {
+    // Any status codes that falls outside the range of 2xx cause this function to trigger
+    // Do something with response error
+    setLoadingCount((state, props) => (state - 1))
+    message.error(error)
+    return Promise.reject(error);
+  });
+}, []);
+
   const [userlogin, setUserlogin] = useState(() => {
     let userProfle = localStorage.getItem("userData");
     if (userProfle) {
@@ -74,6 +103,7 @@ function App() {
           },
         }}
       >
+      <Spin size="large" tip="Loading..." spinning={loadingCount !== 0}>
         {userlogin.email !== "" ? (
           <BrowserRouter>
             <Layout className="layout">
@@ -138,6 +168,7 @@ function App() {
             </Routes>
           </BrowserRouter>
         )}
+        </Spin>
       </ConfigProvider>
     </UserContext.Provider>
   );
