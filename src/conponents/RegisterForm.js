@@ -259,7 +259,7 @@ function RegisterForm() {
                     });
                   },
 
-                  message: "มีคนใช้แล้ว นะจ่ะ",
+                  message: "มีคนใช้แล้ว",
                 },
               ]}
               hasFeedback
