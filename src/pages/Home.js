@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin!
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
 import listPlugin from "@fullcalendar/list";
 import axios from "axios";
+import dayjs from "dayjs";
+import { UserContext } from "../user-context";
 
 import { Row, Col, Modal, Select, Typography, Form, Space } from "antd";
 
+const { Title } = Typography;
+
 function Home() {
-  const { Title } = Typography;
+  const user = useContext(UserContext);
   const [form] = Form.useForm();
   const [events, setIsevents] = useState([]);
+  const eventListRef = React.createRef();
 
   const [OrgLoading, setOrgLoading] = useState(false);
   const [orgList, setOrgList] = useState([]);
@@ -21,12 +26,61 @@ function Home() {
       .get("/org")
       .then((response) => {
         setOrgLoading(false);
-        console.log(response);
         setOrgList(response.data);
       })
       .catch((err) => {
         setOrgLoading(false);
       });
+  }
+
+  const [timeRange, setTimeRange] = useState(() => {
+    let today = dayjs();
+    return {
+      fromTime: today.startOf("month").toISOString(),
+      toTime: today.add(1, "month").startOf("month").toISOString(),
+    };
+  });
+  const [timeRangeActive, setTimeRangeActive] = useState(() => {
+    let today = dayjs();
+    return {
+      fromTime: today.startOf("month").startOf("week").toISOString(),
+      toTime: today.endOf("month").add(1, "week").startOf("week").toISOString(),
+    };
+  });
+
+  function onDatesSet(dateInfo) {
+    setTimeRange({
+      fromTime: dayjs(dateInfo.view.currentStart).toISOString(),
+      toTime: dayjs(dateInfo.view.currentEnd).toISOString(),
+    });
+    setTimeRangeActive({
+      fromTime: dayjs(dateInfo.view.activeStart).toISOString(),
+      toTime: dayjs(dateInfo.view.activeEnd).toISOString(),
+    });
+
+    if (eventListRef.current) {
+      let calendar = eventListRef.current.getApi();
+      calendar.gotoDate(dateInfo.view.currentStart);
+      console.log(calendar);
+    }
+  }
+
+  useEffect(() => {
+    getManageCalendar(form.getFieldsValue());
+  }, [timeRange]);
+
+  function getStatusCount(option) {
+    option = {
+      OrgID: option?.Org,
+      BuildingID: option?.Building,
+      RoomID: option?.Room,
+      ...timeRange,
+    };
+    if (user.role === "Room Contributor") {
+      option["ContributorID"] = user._id;
+    } else if (user.role === "Contributor") {
+      option["OrgID"] = user.org.id;
+    }
   }
 
   const [BuildLoading, setBuildLoading] = useState(false);
@@ -37,17 +91,7 @@ function Home() {
       .get("/org/building/" + id)
       .then((response) => {
         setBuildLoading(false);
-        console.log(response);
-        setBuildingList(
-          response.data.map((item) => {
-            return {
-              ...item,
-              buildingname: item.name,
-            };
-          })
-        );
-        form.resetFields(["buildingname"]);
-        form.resetFields(["Name"]);
+        setBuildingList(response.data);
       })
       .catch((err) => {
         setBuildLoading(false);
@@ -59,12 +103,10 @@ function Home() {
   function getRoomsInOrgID(id) {
     setRoomLoading(true);
     axios
-      .get("/rooms/buildingroom/" + id)
+      .get(`/rooms/buildingroom/${id}`)
       .then((response) => {
         setRoomLoading(false);
-        console.log(response);
         setRoomsList(response.data);
-        form.resetFields(["Name"]);
       })
       .catch((err) => {
         setRoomLoading(false);
@@ -72,7 +114,6 @@ function Home() {
   }
 
   const onChangeorg = (orgID) => {
-    console.log(`selected ${orgID}`);
     if (orgID) {
       getBuildingInOrgID(orgID);
     }
@@ -80,7 +121,6 @@ function Home() {
   };
 
   const onChangebuild = (buildingID) => {
-    console.log(`selected ${buildingID}`);
     if (buildingID) {
       getRoomsInOrgID(buildingID);
     }
@@ -88,8 +128,8 @@ function Home() {
   };
 
   function getManageCalendar(option) {
+    option = { ...option, ...timeRangeActive };
     axios.get("/calendar/searchby", { params: option }).then((response) => {
-      console.log(response);
       setIsevents(
         response.data.map((item) => {
           return {
@@ -103,6 +143,14 @@ function Home() {
     });
   }
 
+  const canNotChangeOrg = ["Room Contributor", "Contributor"].includes(
+    user.role
+  );
+  // let initialValues = {};
+  // if (canNotChangeOrg) {
+  //   initialValues["Org"] = user.org.id;
+  // }
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [values, setValues] = useState({
     title: "",
@@ -110,9 +158,7 @@ function Home() {
     end: "",
     color: "",
   });
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
+
   const handleOk = () => {
     console.log(values);
     setIsModalVisible(false);
@@ -122,12 +168,36 @@ function Home() {
     setIsModalVisible(false);
   };
   const onFilterChange = (changedValues, allValues) => {
-    console.log(changedValues, allValues);
+    if (changedValues.hasOwnProperty("Org")) {
+      onChangeorg(changedValues.Org);
+      allValues.Building = undefined;
+      changedValues.Building = undefined;
+    }
+    if (changedValues.hasOwnProperty("Building")) {
+      onChangebuild(changedValues.Building);
+      allValues.Room = undefined;
+      changedValues.Room = undefined;
+    }
+
     getManageCalendar(allValues);
+    // getStatusCount(allValues);
   };
+
   useEffect(() => {
+    // if (canNotChangeOrg) {
+    //   onChangeorg(user.org.id);
+    // }
     getOrg();
     getManageCalendar();
+    // if (canNotChangeOrg) {
+    //   onChangeorg(user.org.id);
+    //   form.setFieldValue("Org", user.org.id);
+    //   getManageCalendar({ Org: user.org.id });
+    //   getStatusCount({ Org: user.org.id });
+    // } else {
+    //   getManageCalendar();
+    //   getStatusCount();
+    // }
   }, []);
   return (
     <div className="App">
@@ -135,27 +205,8 @@ function Home() {
         <Col span={24}>
           <Row justify="center">
             <Title style={{ color: " #3F478D", fontSize: "56px" }}>
-              Dashboard
+              Calendar
             </Title>
-          </Row>
-
-          <Row justify="center" gutter={[16, 16]}>
-            <Col span={4} offset={2}>
-              <button className="col-1-1">
-                <Title style={{ color: " #FFF", fontSize: "20px" }}>1</Title>
-                <Title style={{ color: " #FFF", fontSize: "12px" }}>
-                  จำนวนการจองวันนี้
-                </Title>
-              </button>
-            </Col>
-            <Col span={4} offset={2}>
-              <button className="col-1-1">
-                <Title style={{ color: " #FFF", fontSize: "20px" }}>1</Title>
-                <Title style={{ color: " #FFF", fontSize: "12px" }}>
-                  จำนวนการจองเดือนนี้
-                </Title>
-              </button>
-            </Col>
           </Row>
 
           <Row
@@ -164,21 +215,12 @@ function Home() {
             style={{ paddingTop: "24px" }}
           >
             <Form
-              form={form}
               onValuesChange={onFilterChange}
-              labelCol={{
-                span: 7,
-              }}
-              wrapperCol={{
-                span: 19,
-              }}
+              form={form}
+              // initialValues={initialValues}
             >
               <Space wrap>
-                <Form.Item
-                  name="Org"
-                  // rules={[{ required: true }]}
-                  label="Organization: "
-                >
+                <Form.Item name="Org" label="Organization">
                   <Select
                     style={{
                       width: "200px",
@@ -187,7 +229,6 @@ function Home() {
                     allowClear
                     placeholder="หน่วยงาน"
                     optionFilterProp="children"
-                    onChange={onChangeorg}
                     filterOption={(input, option) =>
                       (option?.name ?? "")
                         .toLowerCase()
@@ -195,15 +236,11 @@ function Home() {
                     }
                     fieldNames={{ label: "name", value: "_id" }}
                     options={orgList}
-                    loadin={OrgLoading}
+                    loading={OrgLoading}
                   />
                 </Form.Item>
 
-                <Form.Item
-                  name="Building"
-                  // rules={[{ required: true }]}
-                  label=" Building: "
-                >
+                <Form.Item name="Building" label=" Building">
                   <Select
                     style={{
                       width: "200px",
@@ -212,7 +249,6 @@ function Home() {
                     allowClear
                     placeholder="อาคาร/สถานที่"
                     optionFilterProp="children"
-                    onChange={onChangebuild}
                     filterOption={(input, option) =>
                       (option?.name ?? "")
                         .toLowerCase()
@@ -220,15 +256,11 @@ function Home() {
                     }
                     fieldNames={{ label: "name", value: "_id" }}
                     options={buildingList}
-                    loadin={BuildLoading}
+                    loading={BuildLoading}
                   />
                 </Form.Item>
 
-                <Form.Item
-                  name="Room"
-                  // rules={[{ required: true }]}
-                  label=" Room: "
-                >
+                <Form.Item name="Room" label=" Room">
                   <Select
                     style={{
                       width: "200px",
@@ -237,7 +269,6 @@ function Home() {
                     allowClear
                     placeholder="ห้อง"
                     optionFilterProp="children"
-                    // onChange={value => onChange({ ...details, Room: value })}
                     filterOption={(input, option) =>
                       (option?.Name ?? "")
                         .toLowerCase()
@@ -251,50 +282,55 @@ function Home() {
               </Space>
             </Form>
           </Row>
-
+        </Col>
+      </Row>
+      <Row justify="center">
+        <Col span={22}>
           <Row justify="center">
             <Col span={16}>
               <div>
                 <label>
                   <h2>ตารางการใช้งานห้อง</h2>
                 </label>
-                <Col span={24}>
-                  <FullCalendar
-                    plugins={[
-                      dayGridPlugin,
-                      timeGridPlugin,
-                      interactionPlugin,
-                      listPlugin,
-                    ]}
-                    headerToolbar={{
-                      left: "prevYear,nextYear prev,next today",
-                      center: "title",
-                      right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
-                    }}
-                    events={events}
-                  />
-                </Col>
+                <FullCalendar
+                  plugins={[
+                    dayGridPlugin,
+                    timeGridPlugin,
+                    interactionPlugin,
+                    listPlugin,
+                  ]}
+                  headerToolbar={{
+                    left: "prevYear,nextYear prev,next today",
+                    center: "title",
+                    right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+                  }}
+                  events={events}
+                  dayMaxEventRows={3}
+                  datesSet={onDatesSet}
+                  // selectable={true}
+                  // select={handleSelect}
+                />
                 <Modal
-                  title="รายละเอียดการจอง"
-                  visible={isModalVisible}
+                  title="ทำการจอง"
+                  open={isModalVisible}
                   onOk={handleOk}
                   onCancel={handleCancel}
                 ></Modal>
               </div>
             </Col>
-            <Col span={5} offset={1}>
+            <Col span={6} offset={1}>
               <h2>รายละเอียดการจอง</h2>
-
               <FullCalendar
                 plugins={[listPlugin]}
                 initialView="listMonth"
                 headerToolbar={{
-                  left: "prev,next",
+                  left: "",
                   center: "",
-                  right: "title",
+                  right: "",
                 }}
                 events={events}
-                height={"80%"}
+                height={"90%"}
+                ref={eventListRef}
               />
             </Col>
           </Row>
