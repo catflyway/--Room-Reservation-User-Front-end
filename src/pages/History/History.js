@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Tabs, Row, Table, Select } from "antd";
+import { Tabs, Row, Table, Select ,Modal} from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -7,7 +7,6 @@ import { UserContext } from "../../user-context";
 
 function History() {
   const user = useContext(UserContext);
-  const [viewTab, setViewTab] = useState("Pending");
 
   const columnshistoryPending = [
     {
@@ -67,35 +66,34 @@ function History() {
       dataIndex: "Status_Approve",
       width: 200,
       render: (value, record) => {
-        if (viewTab === "Pending") {
-          return <DeleteOutlined style={{ color: "red", marginLeft: 12 }} />;
+        if (value === "Pending") {
+          return <DeleteOutlined  onClick={() => {
+            onDeleteRoom(record);
+          }} style={{ color: "red", marginLeft: 12 }} />;
         } else {
           return value;
         }
       },
-      // render: (value, record) => {
-      //   return (
-      //     <>
-      //       <Select
-      //         value={value}
-      //         onChange={(newValue) => onChangeStatus(record, newValue)}
-      //       >
-      //         <Select.Option value="Pending">Pending</Select.Option>
-      //         <Select.Option value="Cancled">Cancled</Select.Option>
-      //       </Select>
-      //     </>
-      //   );
-      // },
     },
   ];
+  const onDeleteRoom = (record) => {
+    Modal.confirm({
+      title: "Are you sure, you want to delete this request record?",
+      okText: "Yes",
+      okType: "danger",
+      onOk: () => {
+        onChangeStatus(record, "Cancled");
+      },
+    });
+  };
   function onChangeStatus(request, status) {
     let data = {
       Status_Approve: status,
     };
     axios.put("/Requests/" + request._id, data).then((response) => {
-      console.log(response.data);
+      gethistoryPending();
+      gethistoryRejectOrCancel();
     });
-    console.log("Change", request, status);
   }
 
   const [historyPending, sethistoryPending] = useState([]);
@@ -182,7 +180,6 @@ function History() {
           <Tabs
             style={{ alignItems: "center" }}
             items={items}
-            onChange={setViewTab}
             size="large"
           />
         </Row>

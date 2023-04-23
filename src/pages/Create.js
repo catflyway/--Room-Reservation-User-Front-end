@@ -70,7 +70,7 @@ function Create() {
       if (!dateRange[1]) {
         form.setFieldValue("dateRange", [
           dateRange[0],
-          dateRange[0].add(1, "month"),
+          dateRange[0],
         ]);
       }
     }
@@ -163,6 +163,11 @@ function Create() {
 
     form.resetFields();
     onChangeorg(room.Org.id);
+    form.setFieldsValue({
+      OrgID: location.state?.room?.Org.id,
+      Building: location.state?.room?.Building.id,
+      Room: location.state?.room?._id,
+    })
     onChangebuild(room.Building.id);
   }, [location.state]);
 
@@ -194,7 +199,6 @@ function Create() {
                     message: "Please input your Organization!",
                   },
                 ]}
-                initialValue={location.state?.room?.Org.id}
               >
                 <Select
                   showSearch
@@ -219,7 +223,6 @@ function Create() {
                     message: "Please input your Building!",
                   },
                 ]}
-                initialValue={location.state?.room?.Building.id}
               >
                 <Select
                   showSearch
@@ -244,7 +247,6 @@ function Create() {
                     message: "Please input your Room!",
                   },
                 ]}
-                initialValue={location.state?.room?._id}
               >
                 <Select
                   showSearch
@@ -262,7 +264,7 @@ function Create() {
               <Form.Item
                 label="วันจอง"
                 name="dateRange"
-                initialValue={[dayjs(), null]}
+                initialValue={[dayjs().add(1, 'day').startOf('day'), null]}
                 rules={[
                   {
                     required: true,
