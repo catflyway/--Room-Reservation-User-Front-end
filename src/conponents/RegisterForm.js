@@ -13,7 +13,7 @@ import {
   Button,
   Space,
 } from "antd";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { UploadOutlined } from "@ant-design/icons";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -21,6 +21,7 @@ import LoginForm from "./LoginForm";
 
 const { Title } = Typography;
 function RegisterForm() {
+  let navigate = useNavigate();
   const [orgList, setOrgList] = useState([]);
   const [orgLoading, setOrgLoading] = useState(false);
   function getOrg() {
@@ -59,7 +60,6 @@ function RegisterForm() {
     reader.readAsDataURL(img);
   };
   const [form] = Form.useForm();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState();
   const beforeUpload = (file) => {
@@ -97,7 +97,6 @@ function RegisterForm() {
     getOrg();
   }, []);
 
-  const [Clickcreate, setClickcreate] = useState(true);
   const onFormFinish = (formValue) => {
     formValue = {
       ...formValue,
@@ -108,16 +107,14 @@ function RegisterForm() {
       .then((response) => {
         console.log("res", response);
         setLoading(false);
-        setIsModalOpen(false);
         message.success("สมัครสมาชิกสำเร็จ");
-        setClickcreate(false);
+        navigate("/");
       })
       .catch((err) => {
         console.log("err", err);
         setLoading(false);
         message.error("ERROR");
       });
-    setClickcreate(false);
     console.log(formValue);
   };
   const uploadButton = (
@@ -133,199 +130,193 @@ function RegisterForm() {
     </div>
   );
   return (
-    <>
-      {Clickcreate == true ? (
-        <div className="User-list">
-          <Row justify="center">
-            <Col>
-              <Title style={{ color: " #3F478D" }}>RegisterForm</Title>
-            </Col>
-          </Row>
-          <br />
+    <div className="User-list">
+      <Row justify="center">
+        <Col>
+          <Title style={{ color: " #3F478D" }}>RegisterForm</Title>
+        </Col>
+      </Row>
+      <br />
 
-          <Row justify="center">
-            <Col span={18} offset={6}>
-              <Form
-                form={form}
-                labelCol={{
-                  span: 4,
-                }}
-                wrapperCol={{
-                  span: 12,
-                }}
-                layout="horizontal"
-                onFinish={onFormFinish}
-                disabled={loading}
+      <Row justify="center">
+        <Col span={18} offset={6}>
+          <Form
+            form={form}
+            labelCol={{
+              span: 4,
+            }}
+            wrapperCol={{
+              span: 12,
+            }}
+            layout="horizontal"
+            onFinish={onFormFinish}
+            disabled={loading}
+          >
+            <Form.Item
+              name="image"
+              rules={[{ required: true }]}
+              label=""
+              valuePropName="fileList"
+              getValueFromEvent={normFile}
+              wrapperCol={{ span: 16 }}
+            >
+              <Upload
+                accept="image/*"
+                listType="picture-card"
+                showUploadList={false}
+                beforeUpload={beforeUpload}
+                maxCount={1}
+                className="form-upload-picture"
               >
-                <Form.Item
-                  name="image"
-                  rules={[{ required: true }]}
-                  label=""
-                  valuePropName="fileList"
-                  getValueFromEvent={normFile}
-                  wrapperCol={{ span: 16 }}
-                >
-                  <Upload
-                    accept="image/*"
-                    listType="picture-card"
-                    showUploadList={false}
-                    beforeUpload={beforeUpload}
-                    maxCount={1}
-                    className="form-upload-picture"
-                  >
-                    {imageUrl ? (
-                      <div style={{ width: "100%" }}>
-                        <img
-                          src={imageUrl}
-                          alt="avatar"
-                          style={{
-                            maxHeight: "150px",
-                            marginBottom: "8px",
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      uploadButton
-                    )}
-                    {/* <Button icon={<UploadOutlined />}>Click to upload</Button> */}
-                  </Upload>
-                </Form.Item>
+                {imageUrl ? (
+                  <div style={{ width: "100%" }}>
+                    <img
+                      src={imageUrl}
+                      alt="avatar"
+                      style={{
+                        maxHeight: "150px",
+                        marginBottom: "8px",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  uploadButton
+                )}
+                {/* <Button icon={<UploadOutlined />}>Click to upload</Button> */}
+              </Upload>
+            </Form.Item>
 
-                <Form.Item
-                  label="หน่วยงาน"
-                  name="org"
-                  rules={[{ required: true, whitespace: true }]}
-                >
-                  <Select
-                    showSearch
-                    placeholder="หน่วยงาน"
-                    optionFilterProp="children"
-                    onChange={onChangeorg}
-                    filterOption={(input, option) =>
-                      (option?.name ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    fieldNames={{ label: "name", value: "_id" }}
-                    options={orgList}
-                    loading={orgLoading}
-                  />
-                </Form.Item>
-                <Form.Item
-                  label="Username"
-                  name="username"
-                  rules={[
-                    { min: 6, max: 12, required: true, whitespace: true },
-                  ]}
-                  // hasFeedback
-                >
-                  <Input placeholder="Username" />
-                </Form.Item>
-                <Form.Item
-                  label="Firstname"
-                  name="firstname"
-                  rules={[
-                    { min: 6, max: 25, required: true, whitespace: true },
-                  ]}
-                >
-                  <Input placeholder="Firstname" />
-                </Form.Item>
-                <Form.Item
-                  label="Lastname"
-                  name="lastname"
-                  rules={[
-                    { min: 6, max: 25, required: true, whitespace: true },
-                  ]}
-                >
-                  <Input placeholder="Lastname" />
-                </Form.Item>
-                <Form.Item
-                  label="E-mail"
-                  name="email"
-                  validateFirst={true}
-                  rules={[
-                    {
-                      min: 6,
-                      max: 25,
-                      required: true,
-                      type: "email",
-                      whitespace: true,
-                    },
-                    {
-                      validator: (_, value) => {
-                        console.log(value);
-                        return new Promise((resolve) => {
-                          setTimeout(() => {
-                            console.log(value, "ok");
+            <Form.Item
+              label="หน่วยงาน"
+              name="org"
+              rules={[{ required: true, whitespace: true }]}
+            >
+              <Select
+                showSearch
+                placeholder="หน่วยงาน"
+                optionFilterProp="children"
+                onChange={onChangeorg}
+                filterOption={(input, option) =>
+                  (option?.name ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                fieldNames={{ label: "name", value: "_id" }}
+                options={orgList}
+                loading={orgLoading}
+              />
+            </Form.Item>
+            <Form.Item
+              label="Username"
+              name="username"
+              rules={[{ min: 6, max: 12, required: true, whitespace: true }]}
+              // hasFeedback
+            >
+              <Input placeholder="Username" />
+            </Form.Item>
+            <Form.Item
+              label="Firstname"
+              name="firstname"
+              rules={[{ min: 6, max: 25, required: true, whitespace: true }]}
+            >
+              <Input placeholder="Firstname" />
+            </Form.Item>
+            <Form.Item
+              label="Lastname"
+              name="lastname"
+              rules={[{ min: 6, max: 25, required: true, whitespace: true }]}
+            >
+              <Input placeholder="Lastname" />
+            </Form.Item>
+            <Form.Item
+              label="E-mail"
+              name="email"
+              validateFirst={true}
+              rules={[
+                {
+                  min: 6,
+                  max: 25,
+                  required: true,
+                  type: "email",
+                  whitespace: true,
+                },
+                {
+                  validator: (_, value) => {
+                    return new Promise((resolve, reject) => {
+                      axios
+                        .get("/users/searchby", { params: { email: value } })
+                        .then((response) => {
+                          if (response.data.filter((record) => record.email === value).length) {
+                            reject();
+                          } else {
                             resolve();
-                          }, 1000);
+                          }
+                          
+                        })
+                        .catch((err) => {
+                          reject(err);
                         });
-                      },
+                    });
+                  },
 
-                      message: "มีคนใช้แล้ว นะจ่ะ",
-                    },
-                  ]}
-                  hasFeedback
-                >
-                  <Input placeholder="E-mail" />
-                </Form.Item>
-                <Form.Item
-                  label="Password"
-                  name="password"
-                  rules={[
-                    { min: 4, max: 25, required: true, whitespace: true },
-                  ]}
-                >
-                  <Input.Password placeholder="Password" />
-                </Form.Item>
+                  message: "มีคนใช้แล้ว นะจ่ะ",
+                },
+              ]}
+              hasFeedback
+            >
+              <Input placeholder="E-mail" />
+            </Form.Item>
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[{ min: 4, max: 25, required: true, whitespace: true }]}
+            >
+              <Input.Password placeholder="Password" />
+            </Form.Item>
 
-                <Form.Item
-                  label="Status"
-                  name="status"
-                  rules={[{ required: true, whitespace: true }]}
-                >
-                  <Select
-                    showSearch
-                    placeholder="Status"
-                    optionFilterProp="children"
-                    onChange={onChangestatus}
-                    filterOption={(input, option) =>
-                      (option?.name ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    fieldNames={{ label: "name", value: "_id" }}
-                    options={status}
-                    loading={userStatusLoading}
-                  />
-                </Form.Item>
+            <Form.Item
+              label="Status"
+              name="status"
+              rules={[{ required: true, whitespace: true }]}
+            >
+              <Select
+                showSearch
+                placeholder="Status"
+                optionFilterProp="children"
+                onChange={onChangestatus}
+                filterOption={(input, option) =>
+                  (option?.name ?? "")
+                    .toLowerCase()
+                    .includes(input.toLowerCase())
+                }
+                fieldNames={{ label: "name", value: "_id" }}
+                options={status}
+                loading={userStatusLoading}
+              />
+            </Form.Item>
 
-                <Form.Item
-                  label="Role"
-                  name="role"
-                  rules={[{ required: true, whitespace: true }]}
-                >
-                  <Select placeholder="Select a Role">
-                    <Select.Option value="User">User</Select.Option>
-                  </Select>
+            <Form.Item
+              label="Role"
+              name="role"
+              rules={[{ required: true, whitespace: true }]}
+            >
+              <Select placeholder="Select a Role">
+                <Select.Option value="User">User</Select.Option>
+              </Select>
+            </Form.Item>
+            <Row justify="center">
+              <Col span={6}>
+                <Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    สร้างบัญชีผู้ใช้
+                  </Button>
                 </Form.Item>
-                <Row justify="center">
-                  <Col span={6}>
-                    <Form.Item>
-                      <Button type="primary" htmlType="submit">
-                        สร้างบัญชีผู้ใช้
-                      </Button>
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Form>
-            </Col>
-          </Row>
-        </div>
-      ) : (
-        <LoginForm />
-      )}
-    </>
+              </Col>
+            </Row>
+          </Form>
+        </Col>
+      </Row>
+    </div>
   );
 }
 
