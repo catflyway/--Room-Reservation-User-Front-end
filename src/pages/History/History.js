@@ -7,7 +7,6 @@ import { UserContext } from "../../user-context";
 
 function History() {
   const user = useContext(UserContext);
-  const [viewTab, setViewTab] = useState("Pending");
 
   const columnshistoryPending = [
     {
@@ -67,7 +66,7 @@ function History() {
       dataIndex: "Status_Approve",
       width: 200,
       render: (value, record) => {
-        if (viewTab === "Pending") {
+        if (value === "Pending") {
           return <DeleteOutlined style={{ color: "red", marginLeft: 12 }} />;
         } else {
           return value;
@@ -179,12 +178,7 @@ function History() {
           <h1>History</h1>
         </div>
         <Row justify="center">
-          <Tabs
-            style={{ alignItems: "center" }}
-            items={items}
-            onChange={setViewTab}
-            size="large"
-          />
+          <Tabs style={{ alignItems: "center" }} items={items} size="large" />
         </Row>
       </div>
     </div>
