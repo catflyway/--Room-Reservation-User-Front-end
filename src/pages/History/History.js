@@ -1,28 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Tabs, Row, Table, Select } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 import dayjs from "dayjs";
-
-const onChange = (key) => {
-  console.log(key);
-};
+import { UserContext } from "../../user-context";
 
 function History() {
+  const user = useContext(UserContext);
+  const [viewTab, setViewTab] = useState("Pending");
+
   const columnshistoryPending = [
     {
       title: "StartTime",
-      dataIndex: "startTime",
+      render: (text, record, index) => (
+        <>{dayjs(record.startTime[0]).format("DD/MM/YYYY")}</>
+      ),
       key: "startTime",
     },
     {
       title: "EndTime",
-      dataIndex: "endTime",
+      render: (text, record, index) => (
+        <>
+          {dayjs(record.endTime[record.endTime.length - 1]).format(
+            "DD/MM/YYYY"
+          )}
+        </>
+      ),
       key: "endTime",
     },
     {
       title: "AllDay",
-      dataIndex: "timereservation",
+      render: (text, record, index) => (
+        <>
+          {record.allDay
+            ? "Allday"
+            : dayjs(record.startTime[0]).format("HH:mm") +
+              " - " +
+              dayjs(record.endTime[0]).format("HH:mm")}
+        </>
+      ),
       key: "timereservation",
     },
     {
@@ -32,12 +48,12 @@ function History() {
     },
     {
       title: "Building",
-      dataIndex: "buildingname",
+      dataIndex: ["Building", "name"],
       key: "buildingname",
     },
     {
       title: "Room",
-      dataIndex: "roomname",
+      dataIndex: ["Room", "name"],
       key: "roomname",
     },
     {
@@ -51,7 +67,11 @@ function History() {
       dataIndex: "Status_Approve",
       width: 200,
       render: (value, record) => {
-        return <DeleteOutlined style={{ color: "red", marginLeft: 12 }} />;
+        if (viewTab === "Pending") {
+          return <DeleteOutlined style={{ color: "red", marginLeft: 12 }} />;
+        } else {
+          return value;
+        }
       },
       // render: (value, record) => {
       //   return (
@@ -78,97 +98,34 @@ function History() {
     console.log("Change", request, status);
   }
 
-  let toto = localStorage.getItem("userData");
-  let userProfle = JSON.parse(toto);
-
   const [historyPending, sethistoryPending] = useState([]);
   function gethistoryPending() {
     axios
-      .get("requests/searchby?Status_Approve=Pending&UserID=" + userProfle._id)
+      .get("requests/searchby", {
+        params: { Status_Approve: "Pending", UserID: user._id },
+      })
       .then((response) => {
-        console.log(response);
-        sethistoryPending(
-          response.data.map((item) => {
-            let timerev =
-              dayjs(item.startTime[0]).format("HH:mm") +
-              " - " +
-              dayjs(item.endTime[0]).format("HH:mm");
-            if (item.allDay == true) {
-              timerev = "Allday";
-            }
-            return {
-              ...item,
-              startTime: dayjs(item.startTime[0]).format("DD/MM/YYYY"),
-              endTime: dayjs(item.endTime[item.endTime.length - 1]).format(
-                "DD/MM/YYYY"
-              ),
-              timereservation: timerev,
-              buildingname: item.Building.name,
-              roomname: item.Room.name,
-            };
-          })
-        );
+        sethistoryPending(response.data);
       });
   }
   const [historyAppored, sethistoryAppored] = useState([]);
   function gethistoryAppored() {
     axios
-      .get("requests/searchby?Status_Approve=Approved&UserID=" + userProfle._id)
+      .get("requests/searchby", {
+        params: { Status_Approve: "Approved", UserID: user._id },
+      })
       .then((response) => {
-        console.log(response);
-        sethistoryAppored(
-          response.data.map((item) => {
-            let timerev =
-              dayjs(item.startTime[0]).format("HH:mm") +
-              " - " +
-              dayjs(item.endTime[0]).format("HH:mm");
-            if (item.allDay == true) {
-              timerev = "Allday";
-            }
-            return {
-              ...item,
-              startTime: dayjs(item.startTime[0]).format("DD/MM/YYYY"),
-              endTime: dayjs(item.endTime[item.endTime.length - 1]).format(
-                "DD/MM/YYYY"
-              ),
-              timereservation: timerev,
-              buildingname: item.Building.name,
-              roomname: item.Room.name,
-            };
-          })
-        );
+        sethistoryAppored(response.data);
       });
   }
   const [historyRejectOrCancel, sethistoryRejectOrCancel] = useState([]);
   function gethistoryRejectOrCancel() {
     axios
-      .get(
-        "requests/searchby?Status_Approve=Cancled&Status_Approve=Cancled&UserID=" +
-          userProfle._id
-      )
+      .get("requests/searchby", {
+        params: { Status_Approve: ["Rejected", "Cancled"], UserID: user._id },
+      })
       .then((response) => {
-        console.log(response);
-        sethistoryRejectOrCancel(
-          response.data.map((item) => {
-            let timerev =
-              dayjs(item.startTime[0]).format("HH:mm") +
-              " - " +
-              dayjs(item.endTime[0]).format("HH:mm");
-            if (item.allDay == true) {
-              timerev = "Allday";
-            }
-            return {
-              ...item,
-              startTime: dayjs(item.startTime[0]).format("DD/MM/YYYY"),
-              endTime: dayjs(item.endTime[item.endTime.length - 1]).format(
-                "DD/MM/YYYY"
-              ),
-              timereservation: timerev,
-              buildingname: item.Building.name,
-              roomname: item.Room.name,
-            };
-          })
-        );
+        sethistoryRejectOrCancel(response.data);
       });
   }
   useEffect(() => {
@@ -179,35 +136,38 @@ function History() {
 
   const items = [
     {
-      key: "1",
+      key: "Pending",
       label: `กำลังดำเนินการ`,
       children: (
         <Table
           dataSource={historyPending}
           columns={columnshistoryPending}
           pagination={null}
+          rowKey="_id"
         />
       ),
     },
     {
-      key: "2",
+      key: "Appored",
       label: `คำขอที่ได้รับการอนุญาต`,
       children: (
         <Table
           dataSource={historyAppored}
           columns={columnshistoryPending}
           pagination={null}
+          rowKey="_id"
         />
       ),
     },
     {
-      key: "3",
+      key: "RejectOrCancel",
       label: `คำขอที่ได้รับการปฏิเสธ/ยกเลิก`,
       children: (
         <Table
           dataSource={historyRejectOrCancel}
           columns={columnshistoryPending}
           pagination={null}
+          rowKey="_id"
         />
       ),
     },
@@ -221,9 +181,8 @@ function History() {
         <Row justify="center">
           <Tabs
             style={{ alignItems: "center" }}
-            defaultActiveKey="1"
             items={items}
-            onChange={onChange}
+            onChange={setViewTab}
             size="large"
           />
         </Row>
