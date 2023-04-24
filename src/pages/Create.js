@@ -29,24 +29,41 @@ function Create() {
   const location = useLocation();
 
   const [orgList, setOrgList] = useState([]);
+  const [orgLoading, setOrgLoading] = useState(false);
   function getOrg() {
+    setOrgLoading(true);
     axios.get("/org").then((response) => {
+      setOrgLoading(false);
       setOrgList(response.data);
+    }).catch(() => {
+      setOrgLoading(false);
     });
   }
 
   const [buildingList, setBuildingList] = useState([]);
+  const [buildingLoading, setBuildingLoading] = useState(false);
   function getBuildingInOrgID(id) {
+    form.resetFields(["Building", "Room"]);
+    setBuildingLoading(true);
     axios.get("/org/building/" + id).then((response) => {
+      setBuildingLoading(false);
       setBuildingList(response.data);
-    });
+    }).catch(() => {
+      setBuildingLoading(false);
+    })
   }
 
   const [roomsList, setRoomsList] = useState([]);
+  const [roomLoading, setRoomLoading] = useState(false);
   function getRoomsInBuildingID(id) {
+    form.resetFields(["Room"]);
+    setRoomLoading(true);
     axios.get("/rooms/buildingroom/" + id).then((response) => {
+      setRoomLoading(false);
       setRoomsList(response.data);
-    });
+    }).catch(() => {
+      setRoomLoading(false);
+    })
   }
 
   const onChangeorg = (orgID) => {
@@ -139,6 +156,7 @@ function Create() {
       dateRange: undefined,
       timeRange: undefined,
       OrgID: undefined,
+      Building: undefined,
       UserID: user._id,
     };
 
@@ -212,6 +230,8 @@ function Create() {
                   }
                   fieldNames={{ label: "name", value: "_id" }}
                   options={orgList}
+                  disabled={orgLoading}
+                  loading={orgLoading}
                 />
               </Form.Item>
               <Form.Item
@@ -236,6 +256,8 @@ function Create() {
                   }
                   fieldNames={{ label: "name", value: "_id" }}
                   options={buildingList}
+                  disabled={buildingLoading}
+                  loading={buildingLoading}
                 />
               </Form.Item>
               <Form.Item
@@ -259,6 +281,8 @@ function Create() {
                   }
                   fieldNames={{ label: "Name", value: "_id" }}
                   options={roomsList}
+                  disabled={roomLoading}
+                  loading={roomLoading}
                 />
               </Form.Item>
               <Form.Item
