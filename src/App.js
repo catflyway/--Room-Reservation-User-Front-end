@@ -80,7 +80,7 @@ useEffect(() => {
           localStorage.setItem("userData", JSON.stringify(response.data));
         } else {
           console.log(response.data.role);
-          setError("ไม่อยากให้เข้าอะ");
+          setError("ยังไม่มีสิทธิ์ในการใช้งาน");
         }
       })
       .catch((err) => {
