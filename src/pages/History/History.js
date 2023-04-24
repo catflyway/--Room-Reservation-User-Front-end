@@ -67,13 +67,9 @@ function History() {
       width: 200,
       render: (value, record) => {
         if (value === "Pending") {
-<<<<<<< HEAD
           return <DeleteOutlined  onClick={() => {
             onDeleteRoom(record);
-          }} style={{ color: "red", marginLeft: 12 }} />;
-=======
-          return <DeleteOutlined style={{ color: "red", marginLeft: 12 }} />;
->>>>>>> 6a232c9d29eb652792398fff4226c17fa4613219
+          }} style={{ color: "red", marginLeft: 12 }} />
         } else {
           return value;
         }
@@ -181,15 +177,11 @@ function History() {
           <h1>History</h1>
         </div>
         <Row justify="center">
-<<<<<<< HEAD
           <Tabs
             style={{ alignItems: "center" }}
             items={items}
             size="large"
           />
-=======
-          <Tabs style={{ alignItems: "center" }} items={items} size="large" />
->>>>>>> 6a232c9d29eb652792398fff4226c17fa4613219
         </Row>
       </div>
     </div>
