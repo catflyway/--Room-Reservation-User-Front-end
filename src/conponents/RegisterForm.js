@@ -269,7 +269,7 @@ function RegisterForm() {
             <Form.Item
               label="Password"
               name="password"
-              rules={[{ min: 4, max: 25, required: true, whitespace: true }]}
+              rules={[{ min: 6, max: 25, required: true, whitespace: true }]}
             >
               <Input.Password placeholder="Password" />
             </Form.Item>

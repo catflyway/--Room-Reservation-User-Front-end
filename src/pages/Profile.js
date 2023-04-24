@@ -75,15 +75,6 @@ function Profile() {
     getStatus(orgID);
   };
 
-  // const [statuslist, setstatuslist] = useState([]);
-  // function getStatus() {
-  //   axios
-  //     .get("/org/status/" + user.org.id)
-  //     .then((response) => {
-  //       console.log("/org/status/", response.data);
-  //       setstatuslist(response.data);
-  //     });
-  // }
   const [orgList, setOrgList] = useState([]);
   const [orgLoading, setOrgLoading] = useState(false);
   function getOrg() {
@@ -227,7 +218,7 @@ function Profile() {
             <Form.Item
               label="Firstname"
               name="firstname"
-              rules={[{ min: 4, max: 25, required: true, whitespace: true }]}
+              rules={[{ min: 6, max: 25, required: true, whitespace: true }]}
             >
               <Input placeholder="Firstname" />
             </Form.Item>
@@ -251,7 +242,7 @@ function Profile() {
                 },
               ]}
             >
-              <Input placeholder="E-mail" />
+              <Input placeholder="E-mail" disabled={form}/>
             </Form.Item>
             <Form.Item
               label="Password"
