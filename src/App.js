@@ -40,7 +40,8 @@ useEffect(() => {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
     setLoadingCount((state, props) => (state - 1))
-    message.error(error)
+    let msg = error.response?.data || error.response || error.message || error
+    message.error(`${msg}`, 5)
     return Promise.reject(error);
   });
 }, []);
