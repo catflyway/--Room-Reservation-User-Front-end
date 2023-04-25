@@ -57,7 +57,7 @@ function Create() {
   const [roomsList, setRoomsList] = useState([]);
   const [roomLoading, setRoomLoading] = useState(false);
   function getRoomsInBuildingID(id) {
-    // form.resetFields(["Room"]);
+    form.resetFields(["Room"]);
     setRoomLoading(true);
     axios.get("/rooms/buildingroom/" + id).then((response) => {
       setRoomLoading(false);
