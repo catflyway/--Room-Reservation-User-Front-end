@@ -6,7 +6,7 @@ import * as IoIcons from 'react-icons/io';
 import Home from "../pages/Home";
 import Room from "../pages/Room";
 import Create from "../pages/Create";
-import History from "../pages/History/History";
+import History from "../pages/History";
 import Profile from "../pages/Profile";
 
 

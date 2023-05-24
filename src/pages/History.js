@@ -3,7 +3,7 @@ import { Tabs, Row, Table, Select ,Modal} from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 import dayjs from "dayjs";
-import { UserContext } from "../../user-context";
+import { UserContext } from "../user-context";
 
 function History() {
   const user = useContext(UserContext);
