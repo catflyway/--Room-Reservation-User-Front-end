@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, useContext } from "react";
+import React, { useState, useEffect, Fragment, useContext, useRef } from "react";
 import {
   Form,
   Input,
@@ -26,6 +26,7 @@ const { RangePicker } = DatePicker;
 function Create() {
   const user = useContext(UserContext);
   const [form] = Form.useForm();
+  const formRef = useRef(form);
   const location = useLocation();
 
   const [orgList, setOrgList] = useState([]);
@@ -61,6 +62,7 @@ function Create() {
     axios.get("/rooms/buildingroom/" + id).then((response) => {
       setRoomLoading(false);
       setRoomsList(response.data);
+
     }).catch(() => {
       setRoomLoading(false);
     })
@@ -98,19 +100,19 @@ function Create() {
     let timeRange = [0, 24 * 60];
 
     if (!value.allDay) {
-      let startDiff = value.timeRange[0]?.diff(
+      let startDiff = value.timeRange[0]?.clone().diff(
         value.timeRange[0].clone().startOf("day"),
         "minute"
       );
-      let stopDiff = value.timeRange[1]?.diff(
+      let stopDiff = value.timeRange[1]?.clone().diff(
         value.timeRange[1].clone().startOf("day"),
         "minute"
       );
       timeRange = [startDiff, stopDiff];
     }
 
-    const startDate = value.dateRange[0];
-    const endDate = value.dateRange[1];
+    const startDate = value.dateRange[0]?.clone().startOf("day");
+    const endDate = value.dateRange[1]?.clone().add(1, "day").startOf("day");
 
     let getTimeRange = (day) => {
       let start = [
@@ -160,6 +162,7 @@ function Create() {
       UserID: user._id,
     };
 
+    setInitialValues(null);
     axios.post("/Requests", value).then((response) => {
       setIsCreated(true);
       form.resetFields();
@@ -174,20 +177,28 @@ function Create() {
   useEffect(() => {
     getOrg();
   }, []);
+  const [initialValues, setInitialValues] = useState({})
 
   useEffect(() => {
+    console.log("data", location.state)
+    console.log("data",)
+
     if (!location.state) return;
     const room = location.state.room;
 
     form.resetFields();
     onChangeorg(room.Org.id);
-    form.setFieldsValue({
+    setInitialValues({
       OrgID: location.state?.room?.Org.id,
       Building: location.state?.room?.Building.id,
       Room: location.state?.room?._id,
     })
     onChangebuild(room.Building.id);
   }, [location.state]);
+
+  useEffect(() => {
+    formRef.current.resetFields();
+  }, [initialValues]);
 
   return (
     <Fragment>
@@ -207,6 +218,7 @@ function Create() {
               }}
               layout="horizontal"
               onFinish={handleSubmit}
+              initialValues={initialValues}
             >
               <Form.Item
                 label="หน่วยงาน"
@@ -314,7 +326,9 @@ function Create() {
                     const style = {};
                     if (
                       repeatDate === "weeks" &&
-                      current.day() === dateRange?.[0]?.day()
+                      current.day() === dateRange?.[0]?.day() &&
+                      current >= dateRange?.[0]?.startOf("day") &&
+                      current <= dateRange?.[1]?.endOf("day")
                     ) {
                       style.border = "1px solid #1890ff";
                       style.borderRadius = "50%";

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Tabs, Row, Table, Select ,Modal} from "antd";
+import { Tabs, Row, Table, Select, Modal } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -29,15 +29,16 @@ function History() {
     },
     {
       title: "AllDay",
-      render: (text, record, index) => (
-        <>
-          {record.allDay
-            ? "Allday"
-            : dayjs(record.startTime[0]).format("HH:mm") +
-              " - " +
-              dayjs(record.endTime[0]).format("HH:mm")}
-        </>
-      ),
+      // render: (text, record, index) => (
+      //   <>
+      //     {record.allDay
+      //       ? "Allday"
+      //       : dayjs(record.startTime[0]).format("HH:mm") +
+      //       " - " +
+      //       dayjs(record.endTime[0]).format("HH:mm")}
+      //   </>
+      // ),
+      dataIndex: "timereservation",
       key: "timereservation",
     },
     {
@@ -67,7 +68,7 @@ function History() {
       width: 200,
       render: (value, record) => {
         if (value === "Pending") {
-          return <DeleteOutlined  onClick={() => {
+          return <DeleteOutlined onClick={() => {
             onDeleteRoom(record);
           }} style={{ color: "red", marginLeft: 12 }} />
         } else {
@@ -103,7 +104,23 @@ function History() {
         params: { Status_Approve: "Pending", UserID: user._id },
       })
       .then((response) => {
-        sethistoryPending(response.data);
+        // sethistoryPending(response.data);
+        console.log("pe", response.data)
+        sethistoryPending(
+          response.data.map((item) => {
+            let timerev =
+              dayjs(item.startTime[0]).format("HH:mm") +
+              " - " +
+              dayjs(item.endTime[0]).format("HH:mm");
+            if (item.allDay === true) {
+              timerev = "Allday";
+            }
+            return {
+              ...item,
+              timereservation: timerev,
+            };
+          })
+        );
       });
   }
   const [historyAppored, sethistoryAppored] = useState([]);
@@ -113,7 +130,23 @@ function History() {
         params: { Status_Approve: "Approved", UserID: user._id },
       })
       .then((response) => {
-        sethistoryAppored(response.data);
+        // sethistoryAppored(response.data);
+        console.log("ap", response.data)
+        sethistoryAppored(
+          response.data.map((item) => {
+            let timerev =
+              dayjs(item.startTime[0]).format("HH:mm") +
+              " - " +
+              dayjs(item.endTime[0]).format("HH:mm");
+            if (item.allDay === true) {
+              timerev = "Allday";
+            }
+            return {
+              ...item,
+              timereservation: timerev,
+            };
+          })
+        );
       });
   }
   const [historyRejectOrCancel, sethistoryRejectOrCancel] = useState([]);
@@ -123,7 +156,23 @@ function History() {
         params: { Status_Approve: ["Rejected", "Cancled"], UserID: user._id },
       })
       .then((response) => {
-        sethistoryRejectOrCancel(response.data);
+        // sethistoryRejectOrCancel(response.data);
+        console.log("re", response.data)
+        sethistoryRejectOrCancel(
+          response.data.map((item) => {
+            let timerev =
+              dayjs(item.startTime[0]).format("HH:mm") +
+              " - " +
+              dayjs(item.endTime[0]).format("HH:mm");
+            if (item.allDay === true) {
+              timerev = "Allday";
+            }
+            return {
+              ...item,
+              timereservation: timerev,
+            };
+          })
+        );
       });
   }
   useEffect(() => {
